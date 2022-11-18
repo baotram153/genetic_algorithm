@@ -39,6 +39,7 @@ window = sg.Window('convert position to pixel', layout, return_keyboard_events =
 #set up timer
 start_time = time()
 score = 0
+normal_cell = [[0,0]]
 
 
 while True:
@@ -48,19 +49,39 @@ while True:
     if event == 'Left:37':
         direction = DIRECTIONS['left']
         score = score + 1
-        pre_coord = char_coord
+        for cell in normal_cell:
+            if char_coord != cell:
+                pre_coord = char_coord
+            else:
+                normal_cell.clear()
+                normal_cell.append([0,0])
     elif event == 'Up:38':
         direction = DIRECTIONS['up']
         score = score + 1
-        pre_coord = char_coord
+        for cell in normal_cell:
+            if char_coord != cell:
+                pre_coord = char_coord
+            else:
+                normal_cell.clear()
+                normal_cell.append([0,0])
     elif event == 'Right:39':
         direction = DIRECTIONS['right']
         score = score + 1
-        pre_coord = char_coord
+        for cell in normal_cell:
+            if char_coord != cell:
+                pre_coord = char_coord
+            else:
+                normal_cell.clear()
+                normal_cell.append([0,0])
     elif event == 'Down:40':
         direction = DIRECTIONS['down']
         score = score + 1
-        pre_coord = char_coord
+        for cell in normal_cell:
+            if char_coord != cell:
+                pre_coord = char_coord
+            else:
+                normal_cell.clear()
+                normal_cell.append([0,0])
     else: 
         direction = (0,0)
         pre_coord = (50,50)
@@ -78,8 +99,8 @@ while True:
     for cell in doub_cell_pos:
         if char_coord == cell:
             doub_cell_pos.remove(cell)
-            pre_coord = (50,50)
-
+            normal_cell.clear()
+            normal_cell.append(cell)
 
     #draw map
     for i in range(CELL_NUM):   #normal blocks
