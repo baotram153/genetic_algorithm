@@ -152,7 +152,7 @@ def genetic_algorithm(map, objective, n_pop, r_cross, r_mut, n_iter):
         scores = [objective(m) for m in pop_map]
         for j in range(n_pop):
             if scores[j] > best_eval:
-                best, best_eval = pop_map[j], scores[j]
+                best, best_eval = pop_map[j].copy(), scores[j]
                 print(f"Current best: {scores[j]} | {pop_map[j]}")
         selected = [selection(pop_arr,scores) for _ in range(n_pop)]
         #children
@@ -168,17 +168,17 @@ def genetic_algorithm(map, objective, n_pop, r_cross, r_mut, n_iter):
         children_map=[insert(arr, map, n_steps) for arr in children_arr]
         pop_map = children_map
 
-    return [best_eval, best]
+    return best_eval, best
         
 #define some hyperparameters
 map = map1
-n_pop = 500
+n_pop = 200
 r_cross = 0.8
 r_mut = 0.05
-n_iter = 1000
+n_iter = 500
 
 #perform GA and display
-[best_eval, best] = genetic_algorithm(map, fit_func, n_pop, r_cross, r_mut, n_iter)
+best_eval, best = genetic_algorithm(map, fit_func, n_pop, r_cross, r_mut, n_iter)
 
 print("Done!")
 print(best, best_eval)
