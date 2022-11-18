@@ -17,6 +17,7 @@ from numpy.random import rand
 # objective function
     # 1: U  2: D    3: L    4: R
 def objective(n_rows, flag_pos, start, chrom, map):
+    map = map1_2.copy()
     pos = start
     flag_pt, point = 0, 0
     def scores(map):
@@ -40,7 +41,8 @@ def objective(n_rows, flag_pos, start, chrom, map):
             map[pos] = map[pos] -1
         if pos == flag_pos:
             point = point + flag_pt   #if reach flag: +flag point
-        flag_pt = flag_pt +1
+            flag_pt = 0
+        flag_pt = flag_pt + 1
         for block in map:
             if block ==-1 or block ==-3:
                 point = point + scores(map)
@@ -58,6 +60,8 @@ map1 = [-2,-2,-2,-2,-2,-2,-2,-2,
 -2,-2,1,1,0,-2,-2,-2,
 -2,-2,-2,-2,-2,-2,-2,-2]
 print (map1)
+
+map1_2 = map1.copy()
 
 
 #steps calculation
@@ -109,8 +113,7 @@ def genetic_algorithm(n_pop, r_mut, r_cross, n_rows, flag_pos, start, map, objec
     pop = [randint(1,5,steps) for _ in range(n_pop)] 
     best, best_eval = 0, 0
     for i in range(n_iter):
-        scores = [objective(n_rows, flag_pos, start, chrom, map) for chrom in pop]
-        print(map)   #array
+        scores = [objective(n_rows, flag_pos, start, chrom, map) for chrom in pop]   #array
         for k in range(len(scores)):
             if scores[k]> best_eval:
                 best, best_eval = pop[k], scores[k]
@@ -131,14 +134,13 @@ def genetic_algorithm(n_pop, r_mut, r_cross, n_rows, flag_pos, start, map, objec
 
 
 #hyperparameters
-n_pop = 200
+n_pop = 1000
 r_mut = 0.05
 r_cross = 0.9
 n_rows = 8
 flag_pos = 13
 start = 52
-n_iter = 500
-map2 = map1
+n_iter = 1000
 
 #display
 best, best_eval = genetic_algorithm(n_pop, r_mut, r_cross, n_rows, flag_pos, start, map1, objective)

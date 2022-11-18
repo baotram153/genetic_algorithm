@@ -39,7 +39,7 @@ window = sg.Window('convert position to pixel', layout, return_keyboard_events =
 #set up timer
 start_time = time()
 score = 0
-normal_cell = [[0,0]]
+normal_cell = [[50,50]]
 
 
 while True:
@@ -54,7 +54,7 @@ while True:
                 pre_coord = char_coord
             else:
                 normal_cell.clear()
-                normal_cell.append([0,0])
+                normal_cell.append([50,50])
     elif event == 'Up:38':
         direction = DIRECTIONS['up']
         score = score + 1
@@ -63,7 +63,7 @@ while True:
                 pre_coord = char_coord
             else:
                 normal_cell.clear()
-                normal_cell.append([0,0])
+                normal_cell.append([50,50])
     elif event == 'Right:39':
         direction = DIRECTIONS['right']
         score = score + 1
@@ -72,7 +72,7 @@ while True:
                 pre_coord = char_coord
             else:
                 normal_cell.clear()
-                normal_cell.append([0,0])
+                normal_cell.append([50,50])
     elif event == 'Down:40':
         direction = DIRECTIONS['down']
         score = score + 1
@@ -81,7 +81,7 @@ while True:
                 pre_coord = char_coord
             else:
                 normal_cell.clear()
-                normal_cell.append([0,0])
+                normal_cell.append([50,50])
     else: 
         direction = (0,0)
         pre_coord = (50,50)
