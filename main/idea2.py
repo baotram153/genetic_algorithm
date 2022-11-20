@@ -134,13 +134,13 @@ def genetic_algorithm(n_pop, r_mut, r_cross, n_rows, flag_pos, start, map, objec
 
 
 #hyperparameters
-n_pop = 1000
+n_pop = 200
 r_mut = 0.05
 r_cross = 0.9
 n_rows = 8
 flag_pos = 13
 start = 52
-n_iter = 1000
+n_iter = 500
 
 #display
 best, best_eval = genetic_algorithm(n_pop, r_mut, r_cross, n_rows, flag_pos, start, map1, objective)

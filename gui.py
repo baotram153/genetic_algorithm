@@ -9,6 +9,8 @@ CELL_SIZE = CANVAS_SIZE / CELL_NUM
 
 # omitted cells
 om_cell_pos = [(0,0),(4,0),(5,0),(2,2),(5,5)]
+for i in range (CELL_NUM+1):
+    om_cell_pos.extend([(i, CELL_NUM), (CELL_NUM, i), (-1, i), (i,-1)]) # window close when out of range
 
 # double cells
 doub_cell_pos = [(1,1),(4,4)]
@@ -31,7 +33,8 @@ def convert_pos_to_pixel(cell):
 field = sg.Graph(canvas_size=(CANVAS_SIZE, CANVAS_SIZE), 
         graph_bottom_left=(0,0), graph_top_right=(CANVAS_SIZE, CANVAS_SIZE))
 
-layout = [[sg.Text(f'Score: ', font=''),sg.Text('0',expand_x =True, key = '-SCORE-'), sg.Text(f'Time:'), sg.Text(0, key = '-TIME-')],
+layout = [[sg.Text(f'Score:', font='Courier 20'),sg.Text('0', font='Courier 20', expand_x =True, key = '-SCORE-'),
+        sg.Text(f'Time:', font='Courier 20'), sg.Text(0, font = 'Courier 20', key = '-TIME-')],
         [field]]
 
 window = sg.Window('convert position to pixel', layout, return_keyboard_events = True)
@@ -39,7 +42,7 @@ window = sg.Window('convert position to pixel', layout, return_keyboard_events =
 #set up timer
 start_time = time()
 score = 0
-normal_cell = [[50,50]]
+normal_cell = [(50,50)]
 
 
 while True:
@@ -53,8 +56,7 @@ while True:
             if char_coord != cell:
                 pre_coord = char_coord
             else:
-                normal_cell.clear()
-                normal_cell.append([50,50])
+                normal_cell = [(50,50)]
     elif event == 'Up:38':
         direction = DIRECTIONS['up']
         score = score + 1
@@ -62,8 +64,7 @@ while True:
             if char_coord != cell:
                 pre_coord = char_coord
             else:
-                normal_cell.clear()
-                normal_cell.append([50,50])
+                normal_cell = [(50,50)]
     elif event == 'Right:39':
         direction = DIRECTIONS['right']
         score = score + 1
@@ -71,8 +72,7 @@ while True:
             if char_coord != cell:
                 pre_coord = char_coord
             else:
-                normal_cell.clear()
-                normal_cell.append([50,50])
+                normal_cell = [(50,50)]
     elif event == 'Down:40':
         direction = DIRECTIONS['down']
         score = score + 1
@@ -80,8 +80,7 @@ while True:
             if char_coord != cell:
                 pre_coord = char_coord
             else:
-                normal_cell.clear()
-                normal_cell.append([50,50])
+                normal_cell = [(50,50)]
     else: 
         direction = (0,0)
         pre_coord = (50,50)
@@ -94,7 +93,7 @@ while True:
     #update map
     for cell in om_cell_pos:
         if char_coord == cell:
-            window.close()
+            break
     om_cell_pos.append(pre_coord)
     for cell in doub_cell_pos:
         if char_coord == cell:
