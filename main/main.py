@@ -175,7 +175,7 @@ def plot(x,y):
 def objective(n_rows, flag_pos, start, chrom, map):
     map = map1.copy()
     pos = start
-    flag_pt, point = -20, 0
+    flag_pt, point = 0, 0
     n_steps = 0  #calculate actual steps
     def scores(map):
         point = 0
