@@ -19,6 +19,7 @@ import time
 from time import time
 from time import sleep
 
+import matplotlib.pyplot as plt
 
 #GUI
 def gui(best):
@@ -68,7 +69,6 @@ def gui(best):
     while True:
         #keyboard and score
         for gene in best:
-            sleep(0.05)
             event, values = window.read(timeout = 10)
             if gene == 3:
                 direction = DIRECTIONS['left']
@@ -145,20 +145,38 @@ def gui(best):
             #time
             elapsed_time = round(time() - start_time, 1)
             window['-TIME-'].update(elapsed_time)
-            
+
         #break
         if event == sg.WIN_CLOSED:
             break
 
     window.close()
 
+#plot
+def plot(x,y):
+    plt.rcParams['font.size'] = 10
+    plt.rcParams['font.family'] = "serif"
+    tdir = 'in'
+    major = 4.0
+    minor = 2.0
+    plt.rcParams['xtick.direction'] = tdir
+    plt.rcParams['ytick.direction'] = tdir
+    plt.rcParams['xtick.major.size'] = major
+    plt.rcParams['xtick.minor.size'] = minor
+    plt.rcParams['ytick.major.size'] = major
+    plt.rcParams['ytick.minor.size'] = minor
+    plt.xlabel('generation')
+    plt.ylabel('fitness point')
+    plt.scatter(x, y, s=20)
+    plt.show()
 
 # objective function
     # 1: U  2: D    3: L    4: R
 def objective(n_rows, flag_pos, start, chrom, map):
-    map = map1_2.copy()
+    map = map1.copy()
     pos = start
-    flag_pt, point = 0, 0
+    flag_pt, point = -20, 0
+    n_steps = 0  #calculate actual steps
     def scores(map):
         point = 0
         for block in map:
@@ -180,13 +198,13 @@ def objective(n_rows, flag_pos, start, chrom, map):
             map[pos] = map[pos] -1
         if pos == flag_pos:
             point = point + flag_pt   #if reach flag: +flag point
-            flag_pt = 0
         flag_pt = flag_pt + 1
+        n_steps = n_steps + 1
         for block in map:
             if block ==-1 or block ==-3:
                 point = point + scores(map)
-                return point  #int
-        
+                return point, n_steps    #int
+
 
 
 # map setup
@@ -198,9 +216,6 @@ map1 = [-2,-2,-2,-2,-2,-2,-2,-2,
 -2,1,2,1,1,1,1,-2,
 -2,-2,1,1,0,-2,-2,-2,
 -2,-2,-2,-2,-2,-2,-2,-2]
-print (map1)
-
-map1_2 = map1.copy()
 
 
 #steps calculation
@@ -225,13 +240,13 @@ def mutation(child, r_mut):
 
 
 #crossover
-def crossover(p1, p2, r_cross):
+def crossover(p1, p2, r_cross, map):
     p1 = list(p1)
     p2 = list(p2)
     c1 = p1.copy()
     c2 = p2.copy()
     if rand() < r_cross:
-        pt = randint(1, len(p1))
+        pt = randint(1, max(objective(n_rows, flag_pos, start, p1, map)[1], objective(n_rows, flag_pos, start, p2, map)[1],2))
         c1 = p1[:pt] + p2[pt:]
         c2 = p2[:pt] + p1[pt:]
     return [c1,c2]  # 2d-array
@@ -251,9 +266,11 @@ def genetic_algorithm(n_pop, r_mut, r_cross, n_rows, flag_pos, start, map, objec
     steps =steps_calc(map)
     pop = [randint(1,5,steps) for _ in range(n_pop)] 
     best, best_eval = 0, 0
+
+    #iteration
     for i in range(n_iter):
         gen_best_eval, gen_best = 0, 0
-        scores = [objective(n_rows, flag_pos, start, chrom, map) for chrom in pop]   #array
+        scores = [objective(n_rows, flag_pos, start, chrom, map)[0] for chrom in pop]   #array
         for k in range(len(scores)):
             #print best of generation
             if scores[k]> gen_best_eval:
@@ -263,7 +280,11 @@ def genetic_algorithm(n_pop, r_mut, r_cross, n_rows, flag_pos, start, map, objec
                 best, best_eval = pop[k], scores[k]
                 print(f'Current best: {best_eval} || {best}')
                 gui(best)
-        print(f'Best of generation no.{i}: {gen_best_eval}')
+        print(f'Best of generation no.{i}: {gen_best_eval} || {gen_best}')
+
+        #plot
+        x.append(i)
+        y.append(objective(n_rows, flag_pos, start, gen_best, map)[1])
 
         #selection
         selected = [selection(scores, pop) for _ in range(n_pop)]
@@ -273,7 +294,7 @@ def genetic_algorithm(n_pop, r_mut, r_cross, n_rows, flag_pos, start, map, objec
         for j in range(0, n_pop, 2):
             p1 = selected[j]
             p2 = selected[j+1]
-            for c in crossover(p1, p2, r_cross):
+            for c in crossover(p1, p2, r_cross, map):
                 children.append(mutation(c,r_mut))
         pop = children
     return best, best_eval
@@ -287,9 +308,10 @@ n_rows = 8
 flag_pos = 13
 start = 52
 n_iter = 500
+x, y = [], []
 
 #display
 best, best_eval = genetic_algorithm(n_pop, r_mut, r_cross, n_rows, flag_pos, start, map1, objective)
 print("Done!")
 print(f"Current best: {best_eval} || {best}")
-
+plot(x,y)
