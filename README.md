@@ -16,7 +16,7 @@
 
 ## Ý tưởng
 - Em dùng map level 8 của Reach the Flag để làm môi trường chạy cho thuật toán
-![]([RTF_level8.png](https://github.com/baotram153/genetic_algorithm/blob/main/RTF_level8.png))
+<img src="https://github.com/baotram153/genetic_algorithm/blob/main/RTF_level8.png" width="750" height="550">
 - Ý tưởng của em là biến map thành dãy một chiều (bắt đầu từ ô đầu tiên bên trái, lần lượt từ trái sang phải, trên xuống dưới, kết thúc ở ô cuối cùng bên phải), những ô bước lên 1 lần được đánh số 1, những ô bước lên 2 lần được đánh số 2, những ô không bước lên được đánh số -1 (sẽ giải thích ở phần mô tả chương trình)
   - Ví dụ với map phía trên, hàng thứ 4 sẽ được mã hóa [...,1,1,-1,1,1,1,...]
 - Các cá thể (chromosom) là những dãy mà mỗi phần tử (gene) là các số từ 1 đến 4 (lần lượt là up, down, left, right)
