@@ -1,3 +1,4 @@
+# GENETIC ALGORITHM OVERVIEW
 ## 1. What is Genetic Algorithm?
 - the concept of Genetic Algorithm
 	- stochastic global optimization algorithm inspired by evolution by means of natural selection

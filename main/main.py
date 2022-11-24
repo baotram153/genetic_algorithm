@@ -6,11 +6,10 @@
 #   -objective function: -1 each time the character steps on a block, loop through the array once every turn, if there's any block = -1, over,
 #+1 point for the Flag block every steps the character make, the charater will earn that much point when step on the Flag block
 #   -How to make U,R,L,D steps legit?
-#       + outline = -2 --> over when there's a -1 or a -3
+#       + outline = 0 --> over when there's a -1 or a -3
 #       + if outline = 0 --> difficulte to calculate fitness point
 #--------
 
-from numpy import random
 from numpy.random import randint
 from numpy.random import rand
 
@@ -172,23 +171,17 @@ def plot(x,y):
 
 # objective function
     # 1: U  2: D    3: L    4: R
-def objective(n_rows, flag_pos, start, chrom, map):
+def objective(n_columns, flag_pos, start, chrom, map):
     map = map1.copy()
     pos = start
-    flag_pt, point = 0, 0
+    flag_pt, point = -16, 0
     n_steps = 0  #calculate actual steps
-    def scores(map):
-        point = 0
-        for block in map:
-            if block == 0:
-                point = point + 1
-        return point
     for gen in chrom:
         if gen ==1:
-            pos = pos - n_rows
+            pos = pos - n_columns
             map[pos] = map[pos] -1
         if gen ==2:
-            pos = pos + n_rows
+            pos = pos + n_columns
             map[pos] = map[pos] -1
         if gen ==3:
             pos = pos -1
@@ -201,21 +194,21 @@ def objective(n_rows, flag_pos, start, chrom, map):
         flag_pt = flag_pt + 1
         n_steps = n_steps + 1
         for block in map:
-            if block ==-1 or block ==-3:
-                point = point + scores(map)
+            if block ==-1:
+                point = point + n_steps
                 return point, n_steps    #int
 
 
 
 # map setup
-map1 = [-2,-2,-2,-2,-2,-2,-2,-2,
--2,1,1,1,1,2,-2,-2,
--2,1,1,1,1,2,1,-2,
--2,1,1,1,1,1,1,-2,
--2,1,1,-2,1,1,1,-2,
--2,1,2,1,1,1,1,-2,
--2,-2,1,1,0,-2,-2,-2,
--2,-2,-2,-2,-2,-2,-2,-2]
+map1 = [0,0,0,0,0,0,0,0,
+0,1,1,1,1,2,0,0,
+0,1,1,1,1,2,1,0,
+0,1,1,1,1,1,1,0,
+0,1,1,0,1,1,1,0,
+0,1,2,1,1,1,1,0,
+0,0,1,1,0,0,0,0,
+0,0,0,0,0,0,0,0]
 
 
 #steps calculation
@@ -246,7 +239,7 @@ def crossover(p1, p2, r_cross, map):
     c1 = p1.copy()
     c2 = p2.copy()
     if rand() < r_cross:
-        pt = randint(1, max(objective(n_rows, flag_pos, start, p1, map)[1], objective(n_rows, flag_pos, start, p2, map)[1],2))
+        pt = randint(1, max(objective(n_columns, flag_pos, start, p1, map)[1], objective(n_columns, flag_pos, start, p2, map)[1],2))
         c1 = p1[:pt] + p2[pt:]
         c2 = p2[:pt] + p1[pt:]
     return [c1,c2]  # 2d-array
@@ -262,7 +255,7 @@ def selection(scores, pop, k=3):
 
 
 #genetic algorithm
-def genetic_algorithm(n_pop, r_mut, r_cross, n_rows, flag_pos, start, map, objective):
+def genetic_algorithm(n_pop, r_mut, r_cross, n_columns, flag_pos, start, map, objective):
     steps =steps_calc(map)
     pop = [randint(1,5,steps) for _ in range(n_pop)] 
     best, best_eval = 0, 0
@@ -270,7 +263,7 @@ def genetic_algorithm(n_pop, r_mut, r_cross, n_rows, flag_pos, start, map, objec
     #iteration
     for i in range(n_iter):
         gen_best_eval, gen_best = 0, 0
-        scores = [objective(n_rows, flag_pos, start, chrom, map)[0] for chrom in pop]   #array
+        scores = [objective(n_columns, flag_pos, start, chrom, map)[0] for chrom in pop]   #array
         for k in range(len(scores)):
             #print best of generation
             if scores[k]> gen_best_eval:
@@ -284,7 +277,7 @@ def genetic_algorithm(n_pop, r_mut, r_cross, n_rows, flag_pos, start, map, objec
 
         #plot
         x.append(i)
-        y.append(objective(n_rows, flag_pos, start, gen_best, map)[1])
+        y.append(objective(n_columns, flag_pos, start, gen_best, map)[1])
 
         #selection
         selected = [selection(scores, pop) for _ in range(n_pop)]
@@ -304,14 +297,14 @@ def genetic_algorithm(n_pop, r_mut, r_cross, n_rows, flag_pos, start, map, objec
 n_pop = 200
 r_mut = 0.05
 r_cross = 0.9
-n_rows = 8
+n_columns = 8
 flag_pos = 13
 start = 52
 n_iter = 500
 x, y = [], []
 
 #display
-best, best_eval = genetic_algorithm(n_pop, r_mut, r_cross, n_rows, flag_pos, start, map1, objective)
+best, best_eval = genetic_algorithm(n_pop, r_mut, r_cross, n_columns, flag_pos, start, map1, objective)
 print("Done!")
 print(f"Current best: {best_eval} || {best}")
 plot(x,y)
