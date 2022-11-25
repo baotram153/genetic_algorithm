@@ -192,10 +192,12 @@ def objective(n_columns, flag_pos, start, chrom, map):
         if pos == flag_pos:
             point = point + flag_pt   #if reach flag: +flag point
         flag_pt = flag_pt + 1
-        n_steps = n_steps + 1
+        n_steps = n_steps + 1 
         for block in map:
             if block ==-1:
                 point = point + n_steps
+                if flag_pt>0:
+                    point = point - flag_pt
                 return point, n_steps    #int
 
 
@@ -245,13 +247,15 @@ def crossover(p1, p2, r_cross, map):
     return [c1,c2]  # 2d-array
 
 
-#selection
-def selection(scores, pop, k=3):
+#parents selection
+def selection(scores, pop, k=6):
     selection_ix = randint(len(pop))
     for i in [randint(len(pop)) for _ in range(k)]:
         if scores[i] > scores[selection_ix]:
             selection_ix = i
     return pop[selection_ix]
+
+# children selection and pop replacement
 
 
 #genetic algorithm
@@ -265,10 +269,10 @@ def genetic_algorithm(n_pop, r_mut, r_cross, n_columns, flag_pos, start, map, ob
         gen_best_eval, gen_best = 0, 0
         scores = [objective(n_columns, flag_pos, start, chrom, map)[0] for chrom in pop]   #array
         for k in range(len(scores)):
-            #print best of generation
+            # select best of generation
             if scores[k]> gen_best_eval:
                 gen_best_eval, gen_best = scores[k], pop[k]
-            #print overall best
+            # select overall best
             if scores[k] > best_eval:
                 best, best_eval = pop[k], scores[k]
                 print(f'Current best: {best_eval} || {best}')
