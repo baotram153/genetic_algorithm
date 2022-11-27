@@ -101,3 +101,9 @@ hợp thức hóa phần gen không thực hiện trao đổi chéo:
 - Sau khi thử nghiệm thì em thấy cách này không hiệu quả:
   - Những cá thể có điểm fitness thấp nhưng có kiểu gen khác với các cá thể con sẽ không bị thay thế
   - Việc lựa chọn ra cá thể có kiểu hình giống với cá thể con nhất trong quần thể mất nhiều thời gian
+
+### 26/11
+- Em chạy thuật toán của mình cho màn 5 thì thấy kết quả khá khả quan (đến được flag sau khoảng 500 thế hệ)
+
+### 27/11
+- Hoàn thiện gui (bố sung thêm các map khác, bổ sung những ô đi lên 3 lần)

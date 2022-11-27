@@ -8,18 +8,22 @@ CELL_NUM = 6
 CELL_SIZE = CANVAS_SIZE / CELL_NUM
 
 # omitted cells
-om_cell_pos = [(0,0),(4,0),(5,0),(2,2),(5,5)]
+om_cell_pos = [(0,0),(1,0),(2,0),(3,0),(4,0),(5,0),(0,1),(2,1),(3,1),(5,1),(0,3),(1,3),(2,3),(3,3),(5,3),
+                (0,4),(1,4),(2,4),(3,4),(5,4),(0,5),(1,5),(2,5),(3,5),(5,5)]
 for i in range (CELL_NUM+1):
     om_cell_pos.extend([(i, CELL_NUM), (CELL_NUM, i), (-1, i), (i,-1)]) # window close when out of range
 
 # double cells
-doub_cell_pos = [(1,1),(4,4)]
+doub_cell_pos = [(3,2)]
+
+#triple cells
+trip_cell_pos = [(4,2), (1,2)]
 
 #flag
-flag_pos = (4,5)
+flag_pos = (1,2)
 
 # character
-START_CELL = (3,0)
+START_CELL = (4,5)
 char_pos = (START_CELL[0]*CELL_SIZE + CELL_SIZE/2, START_CELL[1]*CELL_SIZE + CELL_SIZE/2)
 char_coord = (round((char_pos[0]-CELL_SIZE/2)/CELL_SIZE, 0), round((char_pos[1]-CELL_SIZE/2)/CELL_SIZE,0))
 DIRECTIONS = {'left' : (-1,0), 'right': (1,0), 'up': (0,1), 'down': (0,-1)}
@@ -93,11 +97,15 @@ while True:
     #update map
     for cell in om_cell_pos:
         if char_coord == cell:
-            break
+            window.close()
     om_cell_pos.append(pre_coord)
     for cell in doub_cell_pos:
         if char_coord == cell:
             doub_cell_pos.remove(cell)
+            normal_cell.clear()
+            normal_cell.append(cell)
+    for cell in trip_cell_pos:
+        if char_coord == cell:
             normal_cell.clear()
             normal_cell.append(cell)
 
@@ -112,6 +120,9 @@ while True:
     for i in doub_cell_pos:
         bl_doub, tr_doub = convert_pos_to_pixel(i)
         field.DrawRectangle(bl_doub, tr_doub, fill_color='darkgoldenrod', line_color='slategrey')
+    for i in trip_cell_pos:
+        bl_doub, tr_doub = convert_pos_to_pixel(i)
+        field.DrawRectangle(bl_doub, tr_doub, fill_color='honeydew3', line_color='slategrey')
     bl_fl, tr_fl = convert_pos_to_pixel(flag_pos)   #flag
     field.DrawRectangle(bl_fl, tr_fl, fill_color = 'indianred', line_color = 'slategrey')
 
