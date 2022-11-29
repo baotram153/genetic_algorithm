@@ -22,137 +22,7 @@ import matplotlib.pyplot as plt
 
 import maps
 import guis
-
-#GUI
-def gui(best):
-    # overall
-    CANVAS_SIZE = 500
-    CELL_NUM = 6
-    CELL_SIZE = CANVAS_SIZE / CELL_NUM
-
-    # omitted cells
-    om_cell_pos = [(0,0),(4,0),(5,0),(2,2),(5,5)]
-    for i in range (CELL_NUM+1):
-        om_cell_pos.extend([(i, CELL_NUM), (CELL_NUM, i), (-1, i), (i,-1)]) # window close when out of range
-    # double cells
-    doub_cell_pos = [(1,1),(4,4)]
-
-    #flag
-    flag_pos = (4,5)
-
-    # character
-    START_CELL = (3,0)
-    char_pos = (START_CELL[0]*CELL_SIZE + CELL_SIZE/2, START_CELL[1]*CELL_SIZE + CELL_SIZE/2)
-    char_coord = (round((char_pos[0]-CELL_SIZE/2)/CELL_SIZE, 0), round((char_pos[1]-CELL_SIZE/2)/CELL_SIZE,0))
-    DIRECTIONS = {'left' : (-1,0), 'right': (1,0), 'up': (0,1), 'down': (0,-1)}
-    direction = (0,0)
-
-    #convert position to pixel
-    def convert_pos_to_pixel(cell):
-        bl = cell[0] * CELL_SIZE, cell[1] * CELL_SIZE
-        tr = bl[0] + CELL_SIZE, bl[1] + CELL_SIZE
-        return bl, tr
-
-    field = sg.Graph(canvas_size=(CANVAS_SIZE, CANVAS_SIZE), 
-            graph_bottom_left=(0,0), graph_top_right=(CANVAS_SIZE, CANVAS_SIZE))
-
-    layout = [[sg.Text(f'Score:', font='Courier 20'),sg.Text('0', font='Courier 20', expand_x =True, key = '-SCORE-'),
-        sg.Text(f'Time:', font='Courier 20'), sg.Text(0, font = 'Courier 20', key = '-TIME-')],
-        [field]]
-
-    window = sg.Window('Reach the Flag', layout)
-
-    #set up timer
-    start_time = time()
-    score = 0
-    normal_cell = [(50,50)]
-
-
-    while True:
-        #keyboard and score
-        for gene in best:
-            event, values = window.read(timeout = 10)
-            if gene == 3:
-                direction = DIRECTIONS['left']
-                score = score + 1
-                for cell in normal_cell:
-                    if char_coord != cell:
-                        pre_coord = char_coord
-                    else:
-                        normal_cell = [(50,50)]
-            elif gene == 1:
-                direction = DIRECTIONS['up']
-                score = score + 1
-                for cell in normal_cell:
-                    if char_coord != cell:
-                        pre_coord = char_coord
-                    else:
-                        normal_cell = [(50,50)]
-            elif gene == 4:
-                direction = DIRECTIONS['right']
-                score = score + 1
-                for cell in normal_cell:
-                    if char_coord != cell:
-                        pre_coord = char_coord
-                    else:
-                        normal_cell = [(50,50)]
-            elif gene == 2:
-                direction = DIRECTIONS['down']
-                score = score + 1
-                for cell in normal_cell:
-                    if char_coord != cell:
-                        pre_coord = char_coord
-                    else:
-                        normal_cell = [(50,50)]
-            else: 
-                direction = (0,0)
-                pre_coord = (50,50)
-            window['-SCORE-'].update(score)
-
-
-            #update position
-            char_pos = (char_pos[0] + direction[0]*CELL_SIZE, char_pos[1] + direction[1]*CELL_SIZE)
-            char_coord = (round((char_pos[0]-CELL_SIZE/2)/CELL_SIZE, 0), round((char_pos[1]-CELL_SIZE/2)/CELL_SIZE,0))
-
-            #update map
-            for cell in om_cell_pos:
-                if char_coord == cell:
-                    window.close()
-                    return
-            om_cell_pos.append(pre_coord)
-            for cell in doub_cell_pos:
-                if char_coord == cell:
-                    doub_cell_pos.remove(cell)
-                    normal_cell.clear()
-                    normal_cell.append(cell)
-
-            #draw map
-            for i in range(CELL_NUM):   #normal blocks
-                for j in range(CELL_NUM):
-                    bl,tr = convert_pos_to_pixel((i,j))
-                    field.DrawRectangle(bl, tr, fill_color = 'goldenrod', line_color = 'slategrey')
-            for i in om_cell_pos:   #omitted blocks
-                bl_om, tr_om = convert_pos_to_pixel(i)
-                field.DrawRectangle(bl_om, tr_om, fill_color = 'slategrey', line_color = 'slategrey')
-            for i in doub_cell_pos:
-                bl_doub, tr_doub = convert_pos_to_pixel(i)
-                field.DrawRectangle(bl_doub, tr_doub, fill_color='darkgoldenrod', line_color='slategrey')
-            bl_fl, tr_fl = convert_pos_to_pixel(flag_pos)   #flag
-            field.DrawRectangle(bl_fl, tr_fl, fill_color = 'indianred', line_color = 'slategrey')
-
-            #draw_character
-            field.DrawCircle(char_pos , radius = CELL_SIZE/2.5, fill_color = 'darkslategrey', line_color='slategrey')
-
-
-            #time
-            elapsed_time = round(time() - start_time, 1)
-            window['-TIME-'].update(elapsed_time)
-
-        #break
-        if event == sg.WIN_CLOSED:
-            break
-
-    window.close()
+from guis import gui
 
 #plot
 def plot(x,y):
@@ -217,7 +87,8 @@ def mutation(child, r_mut):
     return child    #array
 
 
-#crossover
+#crossover 1
+'''
 def crossover(p1, p2, r_cross, map):
     p1 = list(p1)
     p2 = list(p2)
@@ -228,6 +99,29 @@ def crossover(p1, p2, r_cross, map):
         c1 = p1[:pt] + p2[pt:]
         c2 = p2[:pt] + p1[pt:]
     return [c1,c2]  # 2d-array
+'''
+
+#crossover 2
+def crossover(p1, p2, r_cross, map):
+    p1 = list(p1)
+    p2 = list(p2)
+    c1 = p1.copy()
+    c2 = p2.copy()
+    children = [c1,c2]
+    if rand() < r_cross:
+        pt = randint(1, max(objective(n_columns, flag_pos, start_pos, p1, map, total_step)[1], objective(n_columns, flag_pos, start_pos, p2, map, total_step)[1],2))
+        c1 = p1[:pt] + p2[pt:]
+        c2 = p2[:pt] + p1[pt:]
+        children = [c1, c2, p1, p2]
+        for k in range(2):
+            scores = [objective(n_columns, flag_pos, start_pos, chrom, map, total_step)[1] for chrom in children]
+            worst, c_worst = scores[0], children[0]
+            for i in range(len(children)):
+                if scores[i] < worst:
+                    worst = scores[i]
+                    c_worst = children[i] 
+            children.remove(c_worst)  
+    return children
 
 
 #parents selection
@@ -244,24 +138,44 @@ def selection(scores, pop, k=5):
 #genetic algorithm
 def genetic_algorithm(n_pop, r_mut, r_cross, n_columns, flag_pos, start_pos, map, objective, total_step):
     pop = [randint(1,5,total_step) for _ in range(n_pop)] 
-    best, best_eval = 0, 0
+    best, best_eval = [], 0
+    n_counter = 0
+    pre_gen_best_eval = 0
     #iteration
     for i in range(n_iter):
-        gen_best_eval, gen_best = 0, 0
+        gen_best_eval, gen_best = 0, []
         scores = [objective(n_columns, flag_pos, start_pos, chrom, map, total_step)[0] for chrom in pop]   #array
+
+        #select best of generation
         for k in range(len(scores)):
-            #select best of generation
             if scores[k]> gen_best_eval:
                 gen_best_eval, gen_best = scores[k], pop[k]
-            #select overall best
-            if scores[k] > best_eval:
-                best, best_eval = pop[k], scores[k]
-                print(f'Current best: {best_eval} || {best}')
-                gui(best, 2)
-                if (objective(n_columns, flag_pos, start_pos, best, map, total_step)[1]==total_step):
-                    print("Reach The Flag!")
-                    print(f"Best: {best}")
-                    exit()
+
+        #if new best = old best: n_counter++
+        if gen_best_eval == pre_gen_best_eval:
+            n_counter = n_counter + 1
+        pre_gen_best_eval = gen_best_eval
+
+        #select overall best
+        if gen_best_eval > best_eval:
+            best, best_eval = gen_best, gen_best_eval
+            print(f'Current best: {best_eval} || {best}')
+            gui(best, map_num)
+
+        #announce winning
+        if best_eval == map_best :
+            print("Reach The Flag!")
+            print(f"Best: {best}")
+            exit()
+
+        #return r_mut to normal value
+        if r_mut > 0.5: 
+            r_mut = r_mut - 0.5
+
+        # shake population
+        if n_counter == n_max_gen:
+            r_mut = r_mut + 0.5
+            n_counter = 0
         print(f'Best of generation no.{i}: {gen_best_eval} || {gen_best}')
 
         #plot
@@ -282,18 +196,21 @@ def genetic_algorithm(n_pop, r_mut, r_cross, n_columns, flag_pos, start_pos, map
     return best, best_eval
 
 #map setup
-map = maps.select_map(2)
-flag_pos = maps.flag(2)
-start_pos = maps.start(2)
+map_num = 5
+map = maps.select_map(map_num)
+flag_pos = maps.flag(map_num)
+start_pos = maps.start(map_num)
 total_step = maps.steps_calc(map)
-n_columns = maps.columns(2)
+n_columns = maps.columns(map_num)
 gui = guis.gui
+map_best = maps.best(map_num)
 
 #hyperparameters
-n_pop = 300
+n_pop = 1000
 r_mut = 2/total_step
-r_cross = 0.8
-n_iter = 500
+r_cross = 0.9
+n_iter = 10000
+n_max_gen = 50
 x, y = [], []
 
 #display

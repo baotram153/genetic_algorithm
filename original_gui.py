@@ -4,26 +4,26 @@ from random import randint
 
 # overall
 CANVAS_SIZE = 500
-CELL_NUM = 6
+CELL_NUM = 7
 CELL_SIZE = CANVAS_SIZE / CELL_NUM
 
 # omitted cells
-om_cell_pos = [(0,0),(1,0),(2,0),(3,0),(4,0),(5,0),(0,1),(2,1),(3,1),(5,1),(0,3),(1,3),(2,3),(3,3),(5,3),
-                (0,4),(1,4),(2,4),(3,4),(5,4),(0,5),(1,5),(2,5),(3,5),(5,5)]
+om_cell_pos = [(0,0),(1,0),(2,0),(3,0),(4,0),(5,0),(6,0),(0,1),(1,1),(5,1),(6,1),(6,2),(0,3),(1,3),(0,4),(1,4),(6,4),
+                (0,5),(1,5),(2,5),(3,5),(4,5),(5,5),(6,5),(0,6),(1,6),(2,6),(3,6),(4,6),(5,6),(6,6)]
 for i in range (CELL_NUM+1):
     om_cell_pos.extend([(i, CELL_NUM), (CELL_NUM, i), (-1, i), (i,-1)]) # window close when out of range
 
 # double cells
-doub_cell_pos = [(3,2)]
+doub_cell_pos = [(4,2),(3,3),(4,3),(5,3)]
 
 #triple cells
-trip_cell_pos = [(4,2), (1,2)]
+trip_cell_pos = [(50,50)]
 
 #flag
-flag_pos = (1,2)
+flag_pos = (0,2)
 
 # character
-START_CELL = (4,5)
+START_CELL = (6,3)
 char_pos = (START_CELL[0]*CELL_SIZE + CELL_SIZE/2, START_CELL[1]*CELL_SIZE + CELL_SIZE/2)
 char_coord = (round((char_pos[0]-CELL_SIZE/2)/CELL_SIZE, 0), round((char_pos[1]-CELL_SIZE/2)/CELL_SIZE,0))
 DIRECTIONS = {'left' : (-1,0), 'right': (1,0), 'up': (0,1), 'down': (0,-1)}
