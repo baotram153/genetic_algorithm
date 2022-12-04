@@ -107,3 +107,10 @@ hợp thức hóa phần gen không thực hiện trao đổi chéo:
 
 ### 27/11
 - Hoàn thiện gui (bố sung thêm các map khác, bổ sung những ô đi lên 3 lần)
+
+## 28/19
+- Em thử các map từ 4 đến 8 thì map 4, 5, 6 thuật toán chạy ổn, đến map 7 phức tạp hơn một chút thì nó bị stuck, có những trường hợp không thắng nhưng chỉ còn sót lại 1, 2 ô
+
+## 29/19
+- Em thử thêm map 10 và 11 thì map 10 thuật toán chạy ổn, map 11 thì giống như map 7,8 chưa đạt được global optimum
+- Em thử thêm vào một bước selection sau khi crossover và một bước tăng r_mut nếu sau n thế hệ mà số điểm cao nhất vẫn không đổi, em cho chạy thử với map 11 thì nó đạt global optimum ở khoảng thế hệ từ 2000 đến 3000
