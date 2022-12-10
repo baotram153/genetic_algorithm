@@ -108,9 +108,24 @@ hợp thức hóa phần gen không thực hiện trao đổi chéo:
 ### 27/11
 - Hoàn thiện gui (bố sung thêm các map khác, bổ sung những ô đi lên 3 lần)
 
-## 28/19
+## 28/11
 - Em thử các map từ 4 đến 8 thì map 4, 5, 6 thuật toán chạy ổn, đến map 7 phức tạp hơn một chút thì nó bị stuck, có những trường hợp không thắng nhưng chỉ còn sót lại 1, 2 ô
 
-## 29/19
+## 29/11
 - Em thử thêm map 10 và 11 thì map 10 thuật toán chạy ổn, map 11 thì giống như map 7,8 chưa đạt được global optimum
 - Em thử thêm vào một bước selection sau khi crossover và một bước tăng r_mut nếu sau n thế hệ mà số điểm cao nhất vẫn không đổi, em cho chạy thử với map 11 thì nó đạt global optimum ở khoảng thế hệ từ 2000 đến 3000
+
+## 2/12
+- Khắc phục một số chỗ để chương trình chạy nhanh hơn
+
+## 3/12
+- Sửa lại hàm objective, trừ đi điểm ở những ô chưa bước lên
+
+# 4/12
+- Em chạy lại chương trình cho các màn từ 4 đến 12 (trừ màn 9) thì đều chạy được nhưng tốn khá nhiều thời gian (mỗi thế hệ của em chạy khoảng 1 phút, màn 7, 11 thường thắng sau 9000 thế hệ, màn 8, 12 thường thắng sau 40000 thế hệ hoặc hơn)
+
+# 5/12
+- Em thử nghiệm ý tưởng kéo dài chromosome ra thì thuật toán đạt global optimum nhanh hơn rất nhiều ^^. Em sẽ build lại UI và chỉnh sửa chương trình lại theo hướng này
+
+# 6/12 & 7/12
+- Viết báo cáo
