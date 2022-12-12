@@ -239,13 +239,25 @@ def gui(best, map_num):
     #start_pos_time = time()
     score = 0
     normal_cell = [(50,50)]
+    CELL_coord_arr = []
+    om_cell_coord_arr = []
+
+
+# calculate coordination
+    for i in range(CELL_NUM):
+        for j in range (CELL_NUM):
+            CELL_coord = convert_pos_to_pixel((i,j))
+            CELL_coord_arr.append(CELL_coord)
+    for i in om_cell_pos:   #omitted blocks
+            om_cell_coord = convert_pos_to_pixel(i)
+            om_cell_coord_arr.append(om_cell_coord)
 
 
     #while True:
         #keyboard and score
     best.append(1)  # append 1 element for the circle to move to flag
     for gene in best:
-        event, values = window.read(timeout = 10)
+        event, values = window.read(timeout=0.01)
         if gene == 3:
             direction = DIRECTIONS['left']
             for cell in normal_cell:
@@ -303,6 +315,8 @@ def gui(best, map_num):
 
         if pre_coord != flag_pos:
             om_cell_pos.append(pre_coord)
+            om_cell_coord_arr.append(convert_pos_to_pixel(pre_coord))
+
         for cell in doub_cell_pos:
             if char_coord == cell:
                 doub_cell_pos.remove(cell)
@@ -312,15 +326,12 @@ def gui(best, map_num):
             if char_coord == cell:
                 normal_cell.clear()
                 normal_cell.append(cell)
-
+        
         #draw map
-        for i in range(CELL_NUM):   #normal blocks
-            for j in range(CELL_NUM):
-                bl,tr = convert_pos_to_pixel((i,j))
-                field.DrawRectangle(bl, tr, fill_color = 'goldenrod', line_color = 'slategrey')
-        for i in om_cell_pos:   #omitted blocks
-            bl_om, tr_om = convert_pos_to_pixel(i)
-            field.DrawRectangle(bl_om, tr_om, fill_color = 'slategrey', line_color = 'slategrey')
+        for i in range(CELL_NUM**2):
+            field.DrawRectangle(CELL_coord_arr[i][0], CELL_coord_arr[i][1], fill_color = 'goldenrod', line_color = 'slategrey')
+        for i in range(len(om_cell_coord_arr)):
+            field.DrawRectangle(om_cell_coord_arr[i][0], om_cell_coord_arr[i][1], fill_color = 'slategrey', line_color = 'slategrey')
         for i in doub_cell_pos:
             bl_doub, tr_doub = convert_pos_to_pixel(i)
             field.DrawRectangle(bl_doub, tr_doub, fill_color='darkgoldenrod', line_color='slategrey')

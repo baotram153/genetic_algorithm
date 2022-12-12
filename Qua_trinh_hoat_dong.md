@@ -128,4 +128,10 @@ hợp thức hóa phần gen không thực hiện trao đổi chéo:
 - Em thử nghiệm ý tưởng kéo dài chromosome ra thì thuật toán đạt global optimum nhanh hơn rất nhiều ^^. Em sẽ build lại UI và chỉnh sửa chương trình lại theo hướng này
 
 # 6/12 & 7/12
-- Viết báo cáo
+- Viết báo cáo, bổ sung thêm một vài map, chỉnh sửa lại UI
+
+# 10/12
+- Báo cáo giữa kỳ
+
+# 12/12
+- Hoàn thiện code giai đoạn 1, cập nhật file README.md

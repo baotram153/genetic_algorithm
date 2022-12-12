@@ -20,7 +20,6 @@ from time import sleep
 import matplotlib.pyplot as plt
 
 import maps2
-import guis2
 from guis2 import gui
 
 #plot
@@ -112,7 +111,8 @@ def objective(chrom, map):
     return point, n_steps
 
 
-#mutation
+'''
+#mutation 1
 def mutation(child):
     for i in range(gen_num):
         if rand() < r_mut: 
@@ -121,21 +121,29 @@ def mutation(child):
                 gen = randint(1,5)
             child[i] = gen
     return child    #array
+'''
+
+#mutation 2
+def mutation(child):
+    n_mut = randint(0,n_mut_max+1)
+    for i in range(n_mut):
+        child[randint(0,gen_num)] = randint(1,5)
+    return child
 
 
 #crossover 1
-
 def crossover(p1, p2):
     p1 = list(p1)
     p2 = list(p2)
-    c1 = p1.copy()
-    c2 = p2.copy()
     if rand() < r_cross:
         #pt = randint(1, max(objective(n_columns, flag_pos, start_pos, p1, map, total_step)[1], objective(n_columns, flag_pos, start_pos, p2, map, total_step)[1],2))
         pt = randint(gen_num)
         c1 = p1[:pt] + p2[pt:]
         c2 = p2[:pt] + p1[pt:]
-    return [c1,c2]  # 2d-array
+        return [c1,c2]  # 2d-array
+    else:
+        return[p1,p2]
+
 
 '''
 #crossover 2
@@ -206,10 +214,11 @@ def refine(best, map):
                 map[pos] = map[pos] -1
                 best_refined.append(gen)
     return best_refined
+
 #genetic algorithm
 def genetic_algorithm(map, objective):
     pop = [randint(1,5,gen_num) for _ in range(n_pop)] 
-    global r_mut
+    global n_mut_max
     best, best_eval = [], 0
     n_counter = 0
     #iteration
@@ -253,16 +262,12 @@ def genetic_algorithm(map, objective):
             plot1(x,y1)
             #plot2(x,y2)
             exit()
-
-        #return r_mut to normal value
-        if r_mut > 0.8:
-            r_mut -=0.8
     
-        # shake population
+        # regenerate population
         if n_counter == n_max_gen:
-            gui(refine(best, map), map_num)
-            r_mut += 0.8
-            print(f"Shake population at generation no.{i}")
+            #gui(refine(best, map), map_num)
+            print(f"Regenerate population at generation no.{i}")
+            pop = [randint(1,5,gen_num) for _ in range(n_pop)] 
             best_eval = 0
             n_counter = 0
             #gui(gen_best, map_num)
@@ -283,22 +288,22 @@ def genetic_algorithm(map, objective):
     return best, best_eval
 
 #map setup
-map_num = 13
+map_num = 24
 map = maps2.select_map(map_num)
 flag_pos = maps2.flag(map_num)
 start_pos = maps2.start(map_num)
 total_step = maps2.steps_calc(map)
 n_columns = maps2.columns(map_num)
-gui = guis2.gui
 map_best = maps2.best(map_num)
 gen_num = round(total_step*3/2)
 
 #hyperparameters
-n_pop = 500
-r_mut = 3/gen_num
-r_cross = 0.3
+n_pop = 100
+#r_mut = 3/gen_num
+n_mut_max = 3
+r_cross = 0.7
 n_iter = 10000
-n_max_gen = 1000
+n_max_gen = 2000
 x, y1, y2 = [], [], []
 
 #display

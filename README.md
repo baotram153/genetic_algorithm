@@ -10,6 +10,7 @@
     - [Crossover](#crossover)
     - [Selection](#selection)
     - [Genetic Algorithm](#genetic-algorithm)
+    - [Các biến số](#các-biến-số)
     - [Các Hyperparameter](#các-hyperparameter)
   - [Các vấn đề chưa giải quyết được](#các-vấn-đề-chưa-giải-quyết-được)
 
@@ -19,7 +20,7 @@
 <img src="https://github.com/baotram153/genetic_algorithm/blob/main/RTF_level8.png" width="750" height="550">
 - Ý tưởng của em là biến map thành dãy một chiều (bắt đầu từ ô đầu tiên bên trái, lần lượt từ trái sang phải, trên xuống dưới, kết thúc ở ô cuối cùng bên phải), những ô bước lên 1 lần được đánh số 1, những ô bước lên 2 lần được đánh số 2, những ô không bước lên được đánh số -1 (sẽ giải thích ở phần mô tả chương trình)
   - Ví dụ với map phía trên, hàng thứ 4 sẽ được mã hóa [...,1,1,-1,1,1,1,...]
-- Các cá thể (chromosom) là những dãy mà mỗi phần tử (gene) là các số từ 1 đến 4 (lần lượt là up, down, left, right)
+- Các cá thể (chromosom) là các dãy mà mỗi phần tử (gene) là các số từ 1 đến 4 (lần lượt là up, down, left, right)
   - Ví dụ: [4,1,1,3] là right $\rightarrow$ up $\rightarrow$ up $\rightarrow$ left
 - Dựa vào các chromosom, ta sẽ lần lượt trừ đi 1 ở những ô đã bước lên 
 - Cách tính fitness point cho mỗi cá thể: lấy số bước đi được cộng với điểm được tích lũy ở ô cờ mỗi lần bước lên ô cờ (ban đầu set điểm cho ô cờ là số âm để khuyến khích các cá thể không đến ô cờ trước)
@@ -32,22 +33,23 @@
 - PySimpleGUI (build UI)
 - matplotlib (vẽ đồ thị)
 
+
 ### Map setup
 - Map đang sử dụng là 1 map 6x6, tuy nhiên ta sẽ cộng thêm 1 dãy vào mỗi phía của map (để phát hiện và kết thúc nếu nhân vật vượt khỏi phạm vi của map), các ô cộng thêm (các ô không đi được / ngoài phạm vi của map) được gán giá trị 0
-- Những ô bước lên 1 lần được gán giá trị 1, bước lên 2 lần được gán giá trị 2
-```Python 
-map1 = [0,0,0,0,0,0,0,0,
-0,1,1,1,1,2,0,0,
-0,1,1,1,1,2,1,0,
-0,1,1,1,1,1,1,0,
-0,1,1,0,1,1,1,0,
-0,1,2,1,1,1,1,0,
-0,0,1,1,0,0,0,0,
-0,0,0,0,0,0,0,0]
-```
+- Những ô bước lên 1 lần được gán giá trị 1, bước lên 2 lần được gán giá trị 2. Ví dụ:
+  ```Python 
+  map1 = [0,0,0,0,0,0,0,0,
+  0,1,1,1,1,2,0,0,
+  0,1,1,1,1,2,1,0,
+  0,1,1,1,1,1,1,0,
+  0,1,1,0,1,1,1,0,
+  0,1,2,1,1,1,1,0,
+  0,0,1,1,0,0,0,0,
+  0,0,0,0,0,0,0,0]
+  ```
 
 ### Steps calculation
-- Hàm này dùng để tính tổng số bước cần phải đi với map đã setup, nhằm tính số gene cần random trong 1 chromosom
+- Hàm này dùng để tính tổng số bước cần phải đi với map đã setup, dùng để tính số gen trong một chromosome và điểm của ô cờ
   ```Python
     def steps_calc(map):
     steps = 0
@@ -64,10 +66,18 @@ map1 = [0,0,0,0,0,0,0,0,
     flag_pt, point = -16, 0
     n_steps = 0
 ```
-- Từ các gene 1,2,3,4 ở chromosome, ta lần lượt cho nhân vật di chuyển trong map
+- Từ các gen 1,2,3,4 ở chromosome, ta lần lượt cho nhân vật di chuyển trong map
   - n_columns là số cột ở mỗi hàng trong map chuẩn (6+2 cột), map đã setup là mảng một chiều nên ta sẽ dùng +-n_columns để di chuyển trong map
     - Ví dụ: số 1 là up, để "di chuyển lên" trong map thì ta trừ đi n_colums (trừ đi tổng số ô trong một hàng, trong trường hợp này là 8)
-  - Sau khi di chuyển đến 1 ô trong map, trừ 1 điểm ở ô đó
+  - Sau khi di chuyển đến 1 ô trong map, kiểm tra xem đó có phải là ô bước lên được hay không: ô bước lên được sẽ mang giá trị >0, ô không bước lên được sẽ mang giá trị =0, nếu ô di chuyển đến là ô mang giá trị 0 (không bước lên được), ta di chuyển ngược trở lại và tiếp tục với gen tiếp theo
+    - Ví dụ trong trường hợp gen = 1:
+    ```Python
+    if gen ==1:
+            pos = pos - n_columns
+            if map[pos] == 0:
+                pos = pos + n_columns
+    ```
+  - Nếu như ô đó là ô bước lên được (ô mang giá trị > 0), trừ 1 điểm ở ô đó
     ```Python
     if gen ==1:
           pos = pos - n_columns
@@ -88,44 +98,37 @@ map1 = [0,0,0,0,0,0,0,0,
 - Khi đi đến ô cờ, cộng thêm điểm đã tích lũy trong ô cờ (điểm tích lũy ở ô cờ là khác nhau dựa trên số bước đã đi trước khi đến ô cờ)
   ```Python
   if pos == flag_pos:
-            point = point + flag_pt
+      point = point + flag_pt
   ```
 - Mỗi khi di chuyển được 1 bước, cộng một cho số bước và cho ô cờ
   ```Python
   flag_pt = flag_pt + 1
-          n_steps = n_steps + 1
+  n_steps = n_steps + 1
   ```
-- Sau mỗi lần di chuyển, check xem nhân vật có bước vào ô không được đi hay không, nếu có thì tiến hành cộng điểm fitness: điểm fitness là tổng số ô đã tính được ở trên (nếu nhân vật đã đi vào ô cờ) cộng với số bước đã đi được (n_steps) 
+- Sau khi đã đi qua hết các gen trong chromosom, ta tiến hành cộng điểm fitness của cá thể:
   ```Python
-  for block in map:
-          if block ==-1:
-              point = point + n_steps
-              return point, n_steps
+  point = point + n_steps - round(block_distance/2)
   ```
+    - Với n_steps là số bước đi được và block_distance là tổng khoảng cách của những ô còn lại (những ô chưa bước lên) đến ô cờ, được tính như sau:
+    ```Python
+    for i in range(len(map)):
+        if map[i]==1 or map[i]==2:
+            block_distance = block_distance + (((i-flag_pos)/n_columns)**2 + (flag_pos%n_columns - i%n_columns)**2)**0.5
+    ```
 
 ### Mutation
-- Mutation em đang sử dụng là thay đổi giá trị một gene bất kì bởi 1 trong 3 giấ trị còn lại
-  - Với mỗi gene trong chromosom, random 1 giá trị bất kì từ 0 đến 1, nếu giá trị random được nhỏ hơn tỉ lệ mutation (r_mut) thì tiến hành mutation
+- Mutation em đang sử dụng là thay đổi giá trị một gene bất kì
+  - n_mut_max là số gen tối đa trong một chromosom thực hiện mutation
+  - Ta random số gen sẽ thay đổi giá trị, sau đó random các điểm bất kì trên chromosom để thực hiện mutation
     ```Python
-      for i in range(len(child)):
-            if rand() < r_mut:
-    ```
-  - Random giá trị bất kì từ 1 đến 4, nếu trùng với giá tri gene hiện tại thì ta tiếp tục random giá trị mới
-    ```Python
-            gen = randint(1,5)  # random from 1 to 4
-            while gen == child[i]:    
-                gen = randint(1,5)
-            child[i] = gen
-    return child
+      n_mut = randint(0,n_mut_max+1)
+      for i in range(n_mut):
+          child[randint(0,gen_num)] = randint(1,5)
+      return child
     ```
 
 ### Crossover
-- Đời con ban đầu mặc định giống với đời bố mẹ
-  ```Python
-    c1 = p1.copy()
-    c2 = p2.copy()
-  ```
-- Tương tự như mutation, nếu rand() nhỏ hơn tỉ lệ crossover (r_cross) thì ta tiến hành crossover với 2 cá thể con c1 và c2
+- Tương tự như mutation, nếu rand() nhỏ hơn tỉ lệ crossover (r_cross) thì ta tiến hành crossover tạo ra 2 cá thể con c1 và c2
   - Split point sẽ được chọn ngẫu nhiên từ 1 đến số thứ tự gene mà cá thể không đi tiếp được trong map (giúp việc crossover hiệu quả hơn)
   ```Python
   if rand() < r_cross:
@@ -134,9 +137,10 @@ map1 = [0,0,0,0,0,0,0,0,
         c2 = p2[:pt] + p1[pt:]
     return [c1,c2]
   ```
+- Nếu rand() nhỏ hơn tỉ lệ crossover thì ta giữ nguyên kiểu gen của bố mẹ làm kiểu gen của đời con
 
 ### Selection
-- Sử dụng tournament selection để chọn ra 1 cá thể tốt nhất trong 3 cá thể bất kì
+- Sử dụng tournament selection để chọn ra 1 cá thể tốt nhất trong 5 cá thể bất kì
   ```Python
   def selection(scores, pop, k=3):
     selection_ix = randint(len(pop))
@@ -147,11 +151,12 @@ map1 = [0,0,0,0,0,0,0,0,
   ```
 
 ### Genetic Algorithm
-- Tính số bước đi (tương ứng với số gene trong một chromosom) cần phải đi trong map, khởi tạo quần thể ban đầu, set điểm tốt nhất, gen tốt nhất về 0
+- Khởi tạo quần thể ban đầu với số gen trong mỗi chromosom là gen_num (sẽ được đề cập ở phần hyperparameter), thiết lập điểm tốt nhất, gen tốt nhất về 0, n_counter là biến dùng để đếm số thế hệ đã tạo ra
   ```Python
-    steps =steps_calc(map)
-    pop = [randint(1,5,steps) for _ in range(n_pop)] 
-    best, best_eval = 0, 0
+    pop = [randint(1,5,gen_num) for _ in range(n_pop)] 
+    global n_mut_max
+    best, best_eval = [], 0
+    n_counter = 0
   ```
 - Trong mỗi lần lặp lại:
   - Tính số điểm cho mỗi cá thể trong quần thể
@@ -162,17 +167,18 @@ map1 = [0,0,0,0,0,0,0,0,
     - Tìm ra cá thể tốt nhất trong quần thể ở thế hệ hiện tại
       ```Python
       if scores[k]> gen_best_eval:
-                gen_best_eval, gen_best = scores[k], pop[k]
+            gen_best_eval, gen_best = scores[k], pop[k]
       ```
     - Tìm ra cá thể tốt nhất
       ```Python
       if scores[k] > best_eval:
-                best, best_eval = pop[k], scores[k]
+            best, best_eval = pop[k], scores[k]
       ```
-    - Thêm các giá trị thu được vào x, y để vẽ đồ thị trực quan
+    - Thêm các giá trị thu được vào x (thế hệ hiện tại), y1 (độ phù hợp cao nhất của thế hệ hiện tại), y2 (số bước đi được cao nhất của thế hệ hiện tại) để vẽ đồ thị trực quan
       ```Python
       x.append(i)
-        y.append(objective(n_columns, flag_pos, start, gen_best, map)[1])
+      y1.append(gen_best_eval)
+      y2.append(objective(gen_best, map)[1])
       ```
     - Chọn n_pop cá thể bố mẹ tốt nhất (n_pop là số cá thể trong quần thể, một cá thể có điểm fitness cao có thể được chọn nhiều lần)
       ```Python
@@ -191,25 +197,42 @@ map1 = [0,0,0,0,0,0,0,0,
       ```Python
       pop = children
       ```
+    - Ngoài ra, em thêm một cơ chế khởi tạo lại quần thể nếu như độ phù hợp cao nhất của mỗi thế hệ không tăng trong n_max_gen thế hệ (với n_max_gen thiết lập = 2000)
+      ```Python
+      if n_counter == n_max_gen:
+          gui(refine(best, map), map_num)
+          print(f"Regenerate population at generation no.{i}")
+          pop = [randint(1,5,gen_num) for _ in range(n_pop)] 
+          best_eval = 0
+          n_counter = 0
+      ```
+
+### Các biến số
+- Set-up vị trí ô cờ, ô bắt đầu, tổng số bước đi, số cột trong map đã thiết lập, độ phù hợp cao nhất có thể đạt được, số gen trong một nhiễm sắc thể
+  ```Python
+  flag_pos = maps2.flag(map_num)
+  start_pos = maps2.start(map_num)
+  total_step = maps2.steps_calc(map)
+  n_columns = maps2.columns(map_num)
+  map_best = maps2.best(map_num)
+  gen_num = round(total_step*3/2)
+  ```
 
 ### Các Hyperparameter
 - n_pop là số cá thể trong quần thể
-- r_mut là tỉ lệ mutation
+- n_mut_max là số gen tối đa sẽ thay đổi giá trị khi tiến hành đột biến 1 nhiễm sắc thể
 - r_cross là tỉ lệ crossover
-- n_columns là số cột trong một hàng (của map hiện tại)
-- flag_pos, start là vị trí ô flag, vị trí ô start trong map đã setup
 - n_iter là số lần lặp lại / số thế hệ
-- x, y là các mảng dùng để vẽ đồ thị
-```Python
-  n_pop = 200
-  r_mut = 0.05
-  r_cross = 0.9
-  n_columns = 8
-  flag_pos = 13
-  start = 52
-  n_iter = 500
-  x, y = [], []
-```
+- n_max_gen là số thế hệ lặp lại tối đa với độ phù hợp không đổi trước khi khởi tạo lại quần thể
+- x, y1, y2 là các mảng dùng để vẽ đồ thị
+  ```Python
+    n_pop = 100
+    n_mut_max = 3
+    r_cross = 0.7
+    n_iter = 10000
+    n_max_gen = 2000
+    x, y1, y2 = [], [], []
+      ```
+
 ## Các vấn đề chưa giải quyết được
-- Các chromosom về cuối không giữ được tính đa dạng và bị mắc lại ở local optimum, do những chromosom có triển vọng đạt global optimum nhưng điểm ban đầu không cao dẫn đến bị loại bỏ từ sớm
-- Chưa tìm được cách tính điểm phù hợp để khuyến khích các cá thể vừa đi được nhiều bước vừa đến ô flag cuối cùng
+- GUI bị chậm khi đi được một nửa map
