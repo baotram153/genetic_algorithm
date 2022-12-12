@@ -1,10 +1,10 @@
 # README
 - [README](#readme)
+  - [Tổng quan về game Reach The Flag](#tổng-quan-về-game-reach-the-flag)
   - [Ý tưởng](#ý-tưởng)
   - [Mô tả chương trình](#mô-tả-chương-trình)
     - [Các thư viện sử dụng](#các-thư-viện-sử-dụng)
     - [Map setup](#map-setup)
-    - [Steps calculation](#steps-calculation)
     - [Objective funtion](#objective-funtion)
     - [Mutation](#mutation)
     - [Crossover](#crossover)
@@ -14,16 +14,18 @@
     - [Các Hyperparameter](#các-hyperparameter)
   - [Các vấn đề chưa giải quyết được](#các-vấn-đề-chưa-giải-quyết-được)
 
-
+## Tổng quan về game Reach The Flag
+- Luật chơi: Người chơi điều khiển nhân vật đi qua tất cả các ô trước khi đến được ô cắm cờ. 
+- Các ô màu vàng sẽ rơi xuống khi nhân vật bước lên 1 lần, ô màu vàng đậm sẽ rơi xuống khi nhân vật bước lên 2 lần, ô màu xám cho phép nhân vật bước lên vô số lần
 ## Ý tưởng
 - Em dùng map level 8 của Reach the Flag để làm môi trường chạy cho thuật toán
-<img src="https://github.com/baotram153/genetic_algorithm/blob/main/RTF_level8.png" width="750" height="550">
+  <img src="https://github.com/baotram153/genetic_algorithm/blob/main/RTF_level8.png" width="750" height="550">
 - Ý tưởng của em là biến map thành dãy một chiều (bắt đầu từ ô đầu tiên bên trái, lần lượt từ trái sang phải, trên xuống dưới, kết thúc ở ô cuối cùng bên phải), những ô bước lên 1 lần được đánh số 1, những ô bước lên 2 lần được đánh số 2, những ô không bước lên được đánh số -1 (sẽ giải thích ở phần mô tả chương trình)
   - Ví dụ với map phía trên, hàng thứ 4 sẽ được mã hóa [...,1,1,-1,1,1,1,...]
 - Các cá thể (chromosom) là các dãy mà mỗi phần tử (gene) là các số từ 1 đến 4 (lần lượt là up, down, left, right)
   - Ví dụ: [4,1,1,3] là right $\rightarrow$ up $\rightarrow$ up $\rightarrow$ left
 - Dựa vào các chromosom, ta sẽ lần lượt trừ đi 1 ở những ô đã bước lên 
-- Cách tính fitness point cho mỗi cá thể: lấy số bước đi được cộng với điểm được tích lũy ở ô cờ mỗi lần bước lên ô cờ (ban đầu set điểm cho ô cờ là số âm để khuyến khích các cá thể không đến ô cờ trước)
+- Cách tính fitness point cho mỗi cá thể: lấy số bước đi được cộng với điểm được tích lũy ở ô cờ mỗi lần bước lên ô cờ (ban đầu set điểm cho ô cờ là số âm để khuyến khích các cá thể không đến ô cờ trước), sau đó trừ đi tổng khoảng các các ô chưa bước lên đến ô cờ
   - Ví dụ: set điểm cho ô cờ là -10, cá thể đi được 15 bước và bước lên ô cờ vào 2 lần: lần thứ nhất ở bước thứ 6, lần thứ 2 ở bước thứ 13, điểm fitness của cá thể đó sẽ là: 15 + (-10+6) + (-10+13) = 14 điểm
 
 
@@ -48,16 +50,6 @@
   0,0,0,0,0,0,0,0]
   ```
 
-### Steps calculation
-- Hàm này dùng để tính tổng số bước cần phải đi với map đã setup, dùng để tính số gen trong một chromosome và điểm của ô cờ
-  ```Python
-    def steps_calc(map):
-    steps = 0
-    for i in range(len(map)):
-        if map[i]>0:
-            steps = steps + map[i]
-    return steps
-  ```
 
 ### Objective funtion
 - Vị trí ban đầu ở ô start (start = 52), điểm ban đầu của ô cờ là -16, set điểm tổng và số bước là 0 
