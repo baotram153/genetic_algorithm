@@ -201,6 +201,7 @@
 
 ### Các biến số
 - Set-up vị trí ô cờ, ô bắt đầu, tổng số bước đi, số cột trong map đã thiết lập, độ phù hợp cao nhất có thể đạt được, số gen trong một nhiễm sắc thể
+- x, y1, y2 là các mảng dùng để vẽ đồ thị
   ```Python
   flag_pos = maps2.flag(map_num)
   start_pos = maps2.start(map_num)
@@ -208,6 +209,7 @@
   n_columns = maps2.columns(map_num)
   map_best = maps2.best(map_num)
   gen_num = round(total_step*3/2)
+  x, y1, y2 = [], [], []
   ```
 
 ### Các Hyperparameter
@@ -216,14 +218,12 @@
 - r_cross là tỉ lệ crossover
 - n_iter là số lần lặp lại / số thế hệ
 - n_max_gen là số thế hệ lặp lại tối đa với độ phù hợp không đổi trước khi khởi tạo lại quần thể
-- x, y1, y2 là các mảng dùng để vẽ đồ thị
   ```Python
     n_pop = 100
     n_mut_max = 3
     r_cross = 0.7
     n_iter = 10000
     n_max_gen = 2000
-    x, y1, y2 = [], [], []
       ```
 
 ## Các vấn đề chưa giải quyết được

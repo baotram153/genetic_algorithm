@@ -124,7 +124,7 @@ def mutation(child):
 '''
 
 #mutation 2
-def mutation(child):
+def mutation(child, n_mut_max):
     n_mut = randint(0,n_mut_max+1)
     for i in range(n_mut):
         child[randint(0,gen_num)] = randint(1,5)
@@ -132,7 +132,7 @@ def mutation(child):
 
 
 #crossover 1
-def crossover(p1, p2):
+def crossover(p1, p2, r_cross):
     p1 = list(p1)
     p2 = list(p2)
     if rand() < r_cross:
@@ -170,7 +170,7 @@ def crossover(p1, p2, r_cross, map):
 '''
 
 #parents selection
-def selection(scores, pop, k=5):
+def selection(scores, pop, n_pop, k=5):
     selection_ix = randint(n_pop)
     for i in [randint(n_pop) for _ in range(k)]:
         if scores[i] > scores[selection_ix]:
@@ -216,9 +216,9 @@ def refine(best, map):
     return best_refined
 
 #genetic algorithm
-def genetic_algorithm(map, objective):
+def genetic_algorithm(n_pop, n_mut_max, r_cross):
+    start_time = time()
     pop = [randint(1,5,gen_num) for _ in range(n_pop)] 
-    global n_mut_max
     best, best_eval = [], 0
     n_counter = 0
     #iteration
@@ -242,26 +242,18 @@ def genetic_algorithm(map, objective):
         else:
             n_counter = 0
 
+        time_elapsed = time() - start_time
+        if time_elapsed > 30:
+            return best, best_eval, time_elapsed
         #select overall best
         if gen_best_eval > best_eval:
             best, best_eval = gen_best, gen_best_eval
-            print(f'Current best: {best_eval} || {best} || Generation no.{i}')
+            print(f'Current best: {best_eval} || {best} || Generation no.{i} || {int(time_elapsed/60)} min {round(time_elapsed-(int(time_elapsed/60))*60,2)} sec')
             #gui(best, map_num)
 
         #announce winning
         if best_eval >= map_best :
-            print("Reach The Flag!")
-            print(f"Best: {best}")
-            
-            # refine best answer
-            best_refined = refine(best, map)
-            print(best_refined)
-            
-            # use refined best answer to draw gui
-            gui(best_refined, map_num)
-            plot1(x,y1)
-            #plot2(x,y2)
-            exit()
+            return best, best_eval, time_elapsed
     
         # regenerate population
         if n_counter == n_max_gen:
@@ -270,25 +262,21 @@ def genetic_algorithm(map, objective):
             pop = [randint(1,5,gen_num) for _ in range(n_pop)] 
             best_eval = 0
             n_counter = 0
-            #gui(gen_best, map_num)
-
-        #print(f'Best of generation no.{i}: {gen_best_eval} || {gen_best}')
 
         #selection
-        selected = [selection(scores, pop) for _ in range(n_pop)]
+        selected = [selection(scores, pop, n_pop) for _ in range(n_pop)]
 
         #crossover and mutation
         children = list()
         for j in range(0, n_pop, 2):
             p1 = selected[j]
             p2 = selected[j+1]
-            for c in crossover(p1, p2):
-                children.append(mutation(c))
+            for c in crossover(p1, p2, r_cross):
+                children.append(mutation(c, n_mut_max))
         pop = children
-    return best, best_eval
 
 #map setup
-map_num = 24
+map_num = 13
 map = maps2.select_map(map_num)
 flag_pos = maps2.flag(map_num)
 start_pos = maps2.start(map_num)
@@ -298,15 +286,20 @@ map_best = maps2.best(map_num)
 gen_num = round(total_step*3/2)
 
 #hyperparameters
-n_pop = 100
+n_pop = 400
 #r_mut = 3/gen_num
-n_mut_max = 3
-r_cross = 0.7
-n_iter = 10000
+n_mut_max = 7
+r_cross = 0.2
+n_iter = 20000
 n_max_gen = 2000
 x, y1, y2 = [], [], []
 
 #display
-genetic_algorithm(map, objective)
-#print("Done!")
-#print(f"Current best: {best_eval} || {best}")
+'''
+best, best_eval, time_elapsed = genetic_algorithm(n_pop, n_mut_max, r_cross)
+print("Reach the Flag!")
+print(f"Best: {best_eval} || {best}")
+gui(refine(best, map),map_num)
+plot1(x,y1)
+#plot2(x,y2)
+'''
