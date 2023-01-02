@@ -243,7 +243,7 @@ def genetic_algorithm(n_pop, n_mut_max, r_cross):
             n_counter = 0
 
         time_elapsed = time() - start_time
-        if time_elapsed > 30:
+        if time_elapsed > 60:
             return best, best_eval, time_elapsed
         #select overall best
         if gen_best_eval > best_eval:
@@ -276,7 +276,7 @@ def genetic_algorithm(n_pop, n_mut_max, r_cross):
         pop = children
 
 #map setup
-map_num = 12
+map_num = 24
 map = maps2.select_map(map_num)
 flag_pos = maps2.flag(map_num)
 start_pos = maps2.start(map_num)
@@ -286,10 +286,10 @@ map_best = maps2.best(map_num)
 gen_num = round(total_step*3/2)
 
 #hyperparameters
-n_pop = 100
+n_pop = 200
 #r_mut = 3/gen_num
 n_mut_max = 5
-r_cross = 0.8
+r_cross = 0.9
 n_iter = 20000
 n_max_gen = 2000
 x, y1, y2 = [], [], []

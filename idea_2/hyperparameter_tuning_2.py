@@ -265,7 +265,7 @@ def objective(chrom, map):
     map = map.copy()
     pos = start_pos
     flag_pt, point = (-round(total_step/2)), 0
-    n_steps, distance, block_distance = 0, 0, 0  #calculate actual steps
+    n_steps, block_distance = 0, 0  #calculate actual steps
     for gen in chrom:
         if gen ==1:
             pos = pos - n_columns
@@ -344,43 +344,41 @@ def selection(scores, pop, n_pop, k=5):
 def genetic_algorithm(n_pop, n_mut_max, r_cross):
     start_time = time()
     pop = [random.randint(1,5,gen_num) for _ in range(n_pop)] 
-    best, best_eval = [], 0
+    best, best_eval, curr_best_eval = [], 0, 0
     n_counter = 0
     #iteration
     for i in range(n_iter):
         gen_best_eval, gen_best = 0, []
-        scores = [objective(chrom, map)[0] for chrom in pop]   #array
+        scores = [objective(chrom, map)[0] for chrom in pop] 
 
         #select best of generation
         for k in range(len(scores)):
             if scores[k]> gen_best_eval:
                 gen_best_eval, gen_best = scores[k], pop[k]
 
-        #if new best = old best: n_counter++
-        if gen_best_eval <= best_eval:
-            n_counter +=1
-        else:
-            n_counter = 0
 
         time_elapsed = round(time() - start_time,2)
         if time_elapsed > time_limit:
-            return best, best_eval, time_elapsed
+            if best_eval > curr_best_eval:
+                return best, best_eval, time_elapsed    # return the highest score
+            else:
+                return best, curr_best_eval, time_elapsed
 
         #select overall best
-        if gen_best_eval > best_eval:
-            best, best_eval = gen_best, gen_best_eval
-            # print(f'Current best: {best_eval} || {best} || Generation no.{i} || {int(time_elapsed/60)} min {round(time_elapsed-(int(time_elapsed/60))*60,2)} sec')
+        if gen_best_eval > curr_best_eval:
+            best, curr_best_eval = gen_best, gen_best_eval
 
         #announce winning
-        if best_eval >= map_best :
-            return best, best_eval, time_elapsed
+        if curr_best_eval >= map_best :
+            return best, map_best, time_elapsed
     
-        # regenerate population
-        if n_counter == n_max_gen:  
-            # print(f"Regenerate population at generation no.{i}")
+        # regenerate population 
+        if time_elapsed > time_limit/2 and n_counter == 0:
             pop = [random.randint(1,5,gen_num) for _ in range(n_pop)] 
-            best_eval = 0
-            n_counter = 0
+            if curr_best_eval > best_eval:
+                best_eval = curr_best_eval
+            curr_best_eval = 0
+            n_counter = 1
 
         #selection
         selected = [selection(scores, pop, n_pop) for _ in range(n_pop)]
@@ -394,10 +392,11 @@ def genetic_algorithm(n_pop, n_mut_max, r_cross):
                 children.append(mutation(c, n_mut_max))
         pop = children
 
+
 """#### Variables and Hyperparameter"""
 
 #map setup
-map_num = 12
+map_num = 24
 map = select_map(map_num)
 flag_pos = flag(map_num)
 start_pos = start(map_num)
@@ -407,31 +406,13 @@ map_best = best_score(map_num)
 gen_num = round(total_step*3/2)
 
 #hyperparameters
-n_pop = 300
-n_mut_max = 4
-r_cross = 0.5
+# n_pop = 300
+# n_mut_max = 4
+# r_cross = 0.5
 n_iter = 20000
-n_max_gen = 2000
 
-"""#### Run everything"""
-
-# best, best_eval, time_elapsed = genetic_algorithm(n_pop, n_mut_max, r_cross)
-# print("Reach the Flag!")
-# print(f"Best: {best_eval} || {best}")
 
 """## Hyperparameter tuning
-
-### Objective function
-"""
-
-# objective: time minimized
-def objective2(ind):
-    n_pop, n_mut_max, r_cross = ind #unpack ind
-    best, best_eval, time_elapsed = genetic_algorithm(n_pop, n_mut_max, r_cross)
-    if best_eval < map_best:
-        return 'pass'
-    else:
-        return time_elapsed
 
 """### Crossover
 
@@ -489,11 +470,17 @@ def mutation2(c, n_max_mut):
     for i in range(n_mut):
         k = random.randint(0,3)
         if k == 0:
-            c[0] = round(c[0] + random.randint(-2,3)*pop_step,2)   # + or - step
-            if c[0] > pop_upper:    # put c[0] back to range if out of range
-                c[0] = pop_upper
-            if c[0] < pop_lower:
-                c[0] = pop_lower
+            # c[0] = round(c[0] + random.randint(-2,3)*pop_step,2)   # + or - step
+            # if c[0] > pop_upper:    # put c[0] back to range if out of range
+            #     c[0] = pop_upper
+            # if c[0] < pop_lower:
+            #     c[0] = pop_lower  
+            if c[0] != pop_spc[0] and c[0] != pop_spc[-1]:
+                c[0] = pop_spc[pop_spc.index(c[0]) + random.choice([-1,1])]
+            elif c[0] == pop_spc[0]:
+                c[0] == pop_spc[1]
+            elif c[0] == pop_spc [-1]:
+                c[0] == pop_spc[-2]
         elif k == 1: 
             c[1] = round(c[1] + random.randint(-2,3)*cross_step,2)
             if c[1] > cross_upper:
@@ -521,18 +508,23 @@ def selection2(pop_copy, k):
 """### Genetic Algorithm"""
 
 import multiprocessing
-n_p = 6 # number of processors
+n_p = 6     # number of processors
 
 def objective_calc(ind):
-    ind_score = objective2(ind)
-    if ind_score !='pass':
-        print(f'Hyperparameter set {ind} finished in {ind_score}!')
-        return [ind, ind_score]
-
+    # ind_score = objective2(ind)
+    n_pop, r_cross, n_mut_max = ind     #unpack ind
+    best, best_eval, time_elapsed = genetic_algorithm(n_pop, n_mut_max, r_cross)
+    if best_eval < map_best:
+        print(f'Hyperparameter set {ind} unfinished in {time_limit} sec, best score: {best_eval}')
+        return [ind, [best_eval, time_limit]]   # return time_limit because time_elapsed differs around 0.0x sec
+    else:
+        print(f'Hyperparameter set {ind} finished in {time_elapsed}!')
+        return [ind, [best_eval, time_elapsed]]
 
 
 def genetic_algorithm_2(n_pop, n_iter, n_max_mut, r_cross, k):
     # with multiprocessing.Manager() as manager:
+    curr_time = time()
     pop = []
     with multiprocessing.Pool(processes=n_p) as pool:
         while len(pop)<n_pop:
@@ -545,7 +537,8 @@ def genetic_algorithm_2(n_pop, n_iter, n_max_mut, r_cross, k):
             pop.extend(res_arr)
             print(f"Current population: {pop}")
         #sort population based on time (fitness score)
-        pop = sorted(pop, key = lambda x:x[1])[:n_pop]
+        pop = sorted(pop, key = lambda x:x[1][0], reverse=True)
+        pop = sorted(pop, key = lambda x:x[1][1])[:n_pop]
 
         for i in range(n_iter):
             print(f'Population in generation no.{i+1}: {pop}')
@@ -569,26 +562,36 @@ def genetic_algorithm_2(n_pop, n_iter, n_max_mut, r_cross, k):
                 results.append(res)
             res_arr = [res.get() for res in results if res.get()!=None]   # collect results from processor if algorithm finished in limited time
             pop.extend(res_arr)
-            print(f"Pop after children generation: {pop}")
-            pop = sorted(pop, key= lambda x:x[1])[:n_pop]
+            pop = sorted(pop, key = lambda x:x[1][0], reverse=True)
+            pop = sorted(pop, key = lambda x:x[1][1])[:n_pop]
+
         
             print(f'Best solution after {i+1} generation(s): {pop[0]}')
+        time_elapsed = time() - curr_time
+        print(f'Time elapsed: {int(time_elapsed/60)} min {round(time_elapsed - 60*int(time_elapsed/60),2)} sec')
 
 """### Variables and Hyperparameters"""
 
 # set restrictions
-pop_step = 100
-pop_lower = 100
-pop_upper = 1000
-pop_spc = np.arange(pop_lower, pop_upper, pop_step)
+
+"""100 --> 1000"""
+# pop_step = 100
+# pop_lower = 100
+# pop_upper = 1000
+# pop_spc = np.arange(pop_lower, pop_upper, pop_step)
+
+"""10 --> 10000"""
+pop_spc = [10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000]
+
 cross_step = 0.1
 cross_lower = 0.1
 cross_upper = 1
 cross_spc = np.arange(cross_lower, cross_upper, 0.1)
+
 mut_step = 1
 mut_lower = 1
-mut_upper = 10
-mut_spc = np.arange(mut_lower, mut_upper, 1)
+mut_upper = int(gen_num/4)
+mut_spc = np.arange(mut_lower, mut_upper, 2)
 
 # hyperparameters
 k2 = 3
@@ -596,7 +599,7 @@ n_max_mut2 = 3
 n_pop2 = 5
 r_cross2 = 0.5
 n_iter2 = 5
-time_limit = 10
+time_limit = 60
 
 """### Run everything"""
 

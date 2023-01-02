@@ -7,9 +7,11 @@ from time import time
 
 # objective: time minimized
 def objective(ind):
-    n_pop, n_mut_max, r_cross = ind #unpack ind
+    n_pop, r_cross, n_mut_max = ind #unpack ind
+    print(f'{n_pop}, {n_mut_max}, {r_cross}')
     best, best_eval, time_elapsed = genetic_algorithm(n_pop, n_mut_max, r_cross)
     if best_eval < map_best:
+        print(best_eval)
         return 'pass'
     else:
         return time_elapsed
@@ -89,7 +91,8 @@ def genetic_algorithm_2(n_pop, n_max_mut, r_cross, k):
     pop = []    # 2-dimensional array with chromosomes and their scores
     
     while (len(pop) < n_pop):
-        ind = [random.choice(pop_spc), round(random.choice(cross_spc),2), random.choice(mut_spc)]
+        # ind = [random.choice(pop_spc), round(random.choice(cross_spc),2), random.choice(mut_spc)]
+        ind = [100, round(random.choice(cross_spc),2), random.choice(mut_spc)]
         ind_score = objective(ind)
         if ind_score != 'pass':
             pop.append([ind, ind_score])

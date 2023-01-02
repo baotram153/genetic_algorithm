@@ -121,26 +121,33 @@ hợp thức hóa phần gen không thực hiện trao đổi chéo:
 ## 3/12
 - Sửa lại hàm objective, trừ đi điểm ở những ô chưa bước lên
 
-# 4/12
+## 4/12
 - Em chạy lại chương trình cho các màn từ 4 đến 12 (trừ màn 9) thì đều chạy được nhưng tốn khá nhiều thời gian (mỗi thế hệ của em chạy khoảng 1 phút, màn 7, 11 thường thắng sau 9000 thế hệ, màn 8, 12 thường thắng sau 40000 thế hệ hoặc hơn)
 
-# 5/12
+## 5/12
 - Em thử nghiệm ý tưởng kéo dài chromosome ra thì thuật toán đạt global optimum nhanh hơn rất nhiều ^^. Em sẽ build lại UI và chỉnh sửa chương trình lại theo hướng này
 
-# 6/12 & 7/12
+## 6/12 & 7/12
 - Viết báo cáo, bổ sung thêm một vài map, chỉnh sửa lại UI
 
-# 10/12
+## 10/12
 - Báo cáo giữa kỳ
 
-# 12/12
+## 12/12
 - Hoàn thiện code giai đoạn 1, cập nhật file README.md
 
-# 30/12
+## 30/12
 - Em thử up code lên Google Colab nhưng tốc độ chạy không cải thiện
 
-# 31/12 & 1/1
+## 31/12 & 1/1
 - Em sử dụng Multiprocessing cho code của mình như sau:
   - Sau khi generate một thế hệ (gồm các hyperparameter set), em sẽ chia công việc cho các processor để chạy tất cả hyperparameter cùng lúc
   - Chờ tất cả processor chạy xong thì thu kết quả gồm hyperparameter set và thời gian chạy của mỗi hyperparameter set đó (cùng lúc), sau đó dùng kết quả để tiếp tục xử lý bài toán
   - Em dùng Multiprocessing ở 2 chỗ: chỗ thứ nhất lúc khởi tạo quần thể và chỗ thứ hai lúc thử lại thế hệ con đã tạo ra
+
+## 2/1
+- Để thuật toán chạy được cho các màn khó mà không tốn thời gian quá lâu, em đặt ra một mốc thời gian giới hạn, nếu qua mốc thời gian đó mà vẫn chưa thắng được game thì vẫn nhận các cá thể đó, tuy nhiên các cá thể đó sẽ được xếp sau những cá thể đã hoàn thành game, cách sắp xếp như sau:
+  - Xếp các cá thể đã hoàn thành game trước, theo thứ tự thời gian tăng dần
+  - Sau đó xếp các cá thể chưa hoàn thành game, theo thứ tự điểm phù hợp cao nhất giảm dần
+
+
