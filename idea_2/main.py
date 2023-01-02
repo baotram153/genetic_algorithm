@@ -276,7 +276,7 @@ def genetic_algorithm(n_pop, n_mut_max, r_cross):
         pop = children
 
 #map setup
-map_num = 13
+map_num = 12
 map = maps2.select_map(map_num)
 flag_pos = maps2.flag(map_num)
 start_pos = maps2.start(map_num)
@@ -286,20 +286,20 @@ map_best = maps2.best(map_num)
 gen_num = round(total_step*3/2)
 
 #hyperparameters
-n_pop = 400
+n_pop = 100
 #r_mut = 3/gen_num
-n_mut_max = 7
-r_cross = 0.2
+n_mut_max = 5
+r_cross = 0.8
 n_iter = 20000
 n_max_gen = 2000
 x, y1, y2 = [], [], []
 
 #display
-'''
-best, best_eval, time_elapsed = genetic_algorithm(n_pop, n_mut_max, r_cross)
-print("Reach the Flag!")
-print(f"Best: {best_eval} || {best}")
-gui(refine(best, map),map_num)
-plot1(x,y1)
-#plot2(x,y2)
-'''
+
+if __name__ == "__main__":
+    best, best_eval, time_elapsed = genetic_algorithm(n_pop, n_mut_max, r_cross)
+    print("Reach the Flag!")
+    print(f"Best: {best_eval} || {best}")
+    gui(refine(best, map),map_num)
+    plot1(x,y1)
+    #plot2(x,y2)

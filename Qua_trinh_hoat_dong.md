@@ -135,3 +135,12 @@ hợp thức hóa phần gen không thực hiện trao đổi chéo:
 
 # 12/12
 - Hoàn thiện code giai đoạn 1, cập nhật file README.md
+
+# 30/12
+- Em thử up code lên Google Colab nhưng tốc độ chạy không cải thiện
+
+# 31/12 & 1/1
+- Em sử dụng Multiprocessing cho code của mình như sau:
+  - Sau khi generate một thế hệ (gồm các hyperparameter set), em sẽ chia công việc cho các processor để chạy tất cả hyperparameter cùng lúc
+  - Chờ tất cả processor chạy xong thì thu kết quả gồm hyperparameter set và thời gian chạy của mỗi hyperparameter set đó (cùng lúc), sau đó dùng kết quả để tiếp tục xử lý bài toán
+  - Em dùng Multiprocessing ở 2 chỗ: chỗ thứ nhất lúc khởi tạo quần thể và chỗ thứ hai lúc thử lại thế hệ con đã tạo ra

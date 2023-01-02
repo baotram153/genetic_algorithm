@@ -3,6 +3,7 @@ from numpy import random
 from main import genetic_algorithm
 from main import map_best
 import copy
+from time import time
 
 # objective: time minimized
 def objective(ind):
@@ -64,9 +65,9 @@ def mutation(c, n_max_mut):
         elif k == 1: 
             c[1] = round(c[1] + random.randint(-2,3)*cross_step,2)
             if c[1] > cross_upper:
-                c[0] = cross_upper
-            if c[0] < cross_lower:
-                c[0] = cross_lower
+                c[1] = cross_upper
+            if c[1] < cross_lower:
+                c[1] = cross_lower
         elif k == 2:
             c[2] = round(c[2] + random.randint(-2,3)*mut_step,2)
             if c[2] > mut_upper:
@@ -84,6 +85,7 @@ def selection(pop_copy, k):
 
 # genetic algorithm
 def genetic_algorithm_2(n_pop, n_max_mut, r_cross, k):
+    # curr_time = time()
     pop = []    # 2-dimensional array with chromosomes and their scores
     
     while (len(pop) < n_pop):
@@ -96,7 +98,9 @@ def genetic_algorithm_2(n_pop, n_max_mut, r_cross, k):
 
     #sort population based on time (fitness score)
     pop_sorted = sorted(pop, key = lambda x:x[1])
-    
+    # print(time()-curr_time)
+    # exit()
+
     for i in range(n_iter):
         print(f'Population in generation no.{i}: {pop_sorted}')
 
@@ -143,10 +147,3 @@ r_cross = 0.5
 n_iter = 5
 
 genetic_algorithm_2(n_pop, n_max_mut, r_cross, k)
-'''
-my_dict = {1:23, 2:45, 3:12}
-pop = [2,4,6,8]
-for i in sorted(my_dict.items(), key=lambda x:x[1]):
-    print(i)
-    print(pop[i[0]])
-'''
