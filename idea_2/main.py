@@ -218,9 +218,9 @@ def refine(best, map):
 #genetic algorithm
 def genetic_algorithm(n_pop, n_mut_max, r_cross):
     start_time = time()
+    reset_timer = time()
     pop = [randint(1,5,gen_num) for _ in range(n_pop)] 
     best, best_eval = [], 0
-    n_counter = 0
     #iteration
     for i in range(n_iter):
         gen_best_eval, gen_best = 0, []
@@ -236,14 +236,9 @@ def genetic_algorithm(n_pop, n_mut_max, r_cross):
         y1.append(gen_best_eval)
         #y2.append(objective(gen_best, map)[1])
 
-        #if new best = old best: n_counter++
-        if gen_best_eval <= best_eval:
-            n_counter +=1
-        else:
-            n_counter = 0
 
         time_elapsed = time() - start_time
-        if time_elapsed > 60:
+        if time_elapsed > time_limit:
             return best, best_eval, time_elapsed
         #select overall best
         if gen_best_eval > best_eval:
@@ -256,12 +251,12 @@ def genetic_algorithm(n_pop, n_mut_max, r_cross):
             return best, best_eval, time_elapsed
     
         # regenerate population
-        if n_counter == n_max_gen:
+        if (time()-reset_timer) > reset_time:
             #gui(refine(best, map), map_num)
             print(f"Regenerate population at generation no.{i}")
             pop = [randint(1,5,gen_num) for _ in range(n_pop)] 
             best_eval = 0
-            n_counter = 0
+            reset_timer = time()
 
         #selection
         selected = [selection(scores, pop, n_pop) for _ in range(n_pop)]
@@ -286,20 +281,25 @@ map_best = maps2.best(map_num)
 gen_num = round(total_step*3/2)
 
 #hyperparameters
-n_pop = 200
+n_pop = 5000
 #r_mut = 3/gen_num
-n_mut_max = 5
-r_cross = 0.9
+n_mut_max = 2
+r_cross = 0.7
 n_iter = 20000
-n_max_gen = 2000
+# n_max_gen = 1000
+time_limit = 120
+reset_time = time_limit/2
 x, y1, y2 = [], [], []
 
 #display
 
 if __name__ == "__main__":
     best, best_eval, time_elapsed = genetic_algorithm(n_pop, n_mut_max, r_cross)
-    print("Reach the Flag!")
-    print(f"Best: {best_eval} || {best}")
-    gui(refine(best, map),map_num)
-    plot1(x,y1)
-    #plot2(x,y2)
+    if best_eval >= map_best:
+        print("Reach the Flag!")
+        print(f"Best: {best_eval} || {best}")
+        gui(refine(best, map),map_num)
+        plot1(x,y1)
+        #plot2(x,y2)
+    else:
+        print(f"Program ended in {time_elapsed} sec \nBest solution found: {best_eval} || {best}")

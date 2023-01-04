@@ -318,17 +318,43 @@ def mutation(child, n_mut_max):
 
 """#### Crossover"""
 
-def crossover(p1, p2, r_cross):
-    p1 = list(p1)
-    p2 = list(p2)
-    if random.rand() < r_cross:
-        #pt = randint(1, max(objective(n_columns, flag_pos, start_pos, p1, map, total_step)[1], objective(n_columns, flag_pos, start_pos, p2, map, total_step)[1],2))
-        pt = random.randint(gen_num)
-        c1 = p1[:pt] + p2[pt:]
-        c2 = p2[:pt] + p1[pt:]
-        return [c1,c2]  # 2d-array
+def crossover(p1, p2, r_cross, cross_type):
+    def onept_cross(p1, p2, r_cross):
+        p1 = list(p1)
+        p2 = list(p2)
+        if random.rand() < r_cross:
+            #pt = randint(1, max(objective(n_columns, flag_pos, start_pos, p1, map, total_step)[1], objective(n_columns, flag_pos, start_pos, p2, map, total_step)[1],2))
+            pt = random.randint(gen_num)
+            c1 = p1[:pt] + p2[pt:]
+            c2 = p2[:pt] + p1[pt:]
+            return c1,c2  # 2d-array
+        else:
+            return p1,p2
+    def twopt_cross(p1, p2, r_cross):
+        p1 = list(p1)
+        p2 = list(p2)
+        if random.rand() < r_cross:
+            ptA, ptB = random.randint(0, len(p1)), random.randint(0, len(p1))
+            pt1, pt2 = min(ptA, ptB), max(ptA, ptB)
+            c1 = p1[:pt1] + p2[pt1:pt2] + p1[pt2:]
+            c2 = p2[:pt1] + p1[pt1:pt2] + p2[pt2:]
+            return c1,c2
+        else:
+            return p1,p2
+    def uniform_cross(p1, p2, r_cross):
+        c1 = copy.deepcopy(p1)
+        c2 = copy.deepcopy(p2)
+        for i in range (3):
+            if random.rand() < r_cross:
+                c1[i], c2[i] = p2[i], p1[i]
+        return c1, c2
+    if cross_type == 'one-point':
+        return onept_cross(p1, p2, r_cross)
+    elif cross_type == 'two-point':
+        return twopt_cross(p1, p2, r_cross)
     else:
-        return[p1,p2]
+        return uniform_cross(p1, p2, r_cross)
+
 
 """#### Selection"""
 
@@ -341,7 +367,7 @@ def selection(scores, pop, n_pop, k=5):
 
 """#### Genetic Algorithm (put everything together)"""
 
-def genetic_algorithm(n_pop, n_mut_max, r_cross):
+def genetic_algorithm(n_pop, n_mut_max, r_cross, cross_type):
     start_time = time()
     pop = [random.randint(1,5,gen_num) for _ in range(n_pop)] 
     best, best_eval, curr_best_eval = [], 0, 0
@@ -388,7 +414,7 @@ def genetic_algorithm(n_pop, n_mut_max, r_cross):
         for j in range(0, n_pop, 2):
             p1 = selected[j]
             p2 = selected[j+1]
-            for c in crossover(p1, p2, r_cross):
+            for c in crossover(p1, p2, r_cross, cross_type):
                 children.append(mutation(c, n_mut_max))
         pop = children
 
@@ -396,14 +422,14 @@ def genetic_algorithm(n_pop, n_mut_max, r_cross):
 """#### Variables and Hyperparameter"""
 
 #map setup
-map_num = 24
-map = select_map(map_num)
-flag_pos = flag(map_num)
-start_pos = start(map_num)
-total_step = steps_calc(map)
-n_columns = columns(map_num)
-map_best = best_score(map_num)
-gen_num = round(total_step*3/2)
+# map_num = 24
+# map = select_map(map_num)
+# flag_pos = flag(map_num)
+# start_pos = start(map_num)
+# total_step = steps_calc(map)
+# n_columns = columns(map_num)
+# map_best = best_score(map_num)
+# gen_num = round(total_step*3/2)
 
 #hyperparameters
 # n_pop = 300
@@ -436,7 +462,7 @@ def crossover(p1, p2, r_cross):
 def crossover2(p1, p2, r_cross):
     c1 = copy.deepcopy(p1)
     c2 = copy.deepcopy(p2)
-    for i in range (3):
+    for i in range (len(p1)):
         if random.rand() < r_cross:
             c1[i], c2[i] = p2[i], p1[i]
     return c1, c2
@@ -467,32 +493,32 @@ def mutation2(c, n_max_mut):
 
 def mutation2(c, n_max_mut):
     n_mut = random.randint(0, n_max_mut+1)
-    for i in range(n_mut):
-        k = random.randint(0,3)
-        if k == 0:
-            # c[0] = round(c[0] + random.randint(-2,3)*pop_step,2)   # + or - step
-            # if c[0] > pop_upper:    # put c[0] back to range if out of range
-            #     c[0] = pop_upper
-            # if c[0] < pop_lower:
-            #     c[0] = pop_lower  
+    gen_mut = [random.randint(len(c)) for _ in range(n_mut)] # choose n_mut gen randomly to mutate
+    for k in gen_mut:
+        if k == 0: 
             if c[0] != pop_spc[0] and c[0] != pop_spc[-1]:
                 c[0] = pop_spc[pop_spc.index(c[0]) + random.choice([-1,1])]
-            elif c[0] == pop_spc[0]:
-                c[0] == pop_spc[1]
-            elif c[0] == pop_spc [-1]:
-                c[0] == pop_spc[-2]
+            if c[0] == pop_spc[0]:
+                c[0] = pop_spc[1]
+            if c[0] == pop_spc[-1]:
+                c[0] = pop_spc[-2]
         elif k == 1: 
-            c[1] = round(c[1] + random.randint(-2,3)*cross_step,2)
+            c[1] = round(c[1] + random.choice([-2,-1,1,2])*cross_step,2)
             if c[1] > cross_upper:
                 c[1] = cross_upper
             if c[1] < cross_lower:
                 c[1] = cross_lower
         elif k == 2:
-            c[2] = round(c[2] + random.randint(-2,3)*mut_step,2)
+            c[2] = round(c[2] + random.choice([-2,-1,1,2])*mut_step,2)
             if c[2] > mut_upper:
                 c[2] = mut_upper
             if c[2] < mut_lower:
                 c[2] = mut_lower
+        elif k == 3:
+            type = random.choice(cross_type_spc)
+            while type == c[3]:
+                type = random.choice(cross_type_spc)
+            c[3] = type
     return c
 
 """#### Selection
@@ -512,8 +538,8 @@ n_p = 6     # number of processors
 
 def objective_calc(ind):
     # ind_score = objective2(ind)
-    n_pop, r_cross, n_mut_max = ind     #unpack ind
-    best, best_eval, time_elapsed = genetic_algorithm(n_pop, n_mut_max, r_cross)
+    n_pop, r_cross, n_mut_max, cross_type = ind     #unpack ind
+    best, best_eval, time_elapsed = genetic_algorithm(n_pop, n_mut_max, r_cross, cross_type)
     if best_eval < map_best:
         print(f'Hyperparameter set {ind} unfinished in {time_limit} sec, best score: {best_eval}')
         return [ind, [best_eval, time_limit]]   # return time_limit because time_elapsed differs around 0.0x sec
@@ -530,7 +556,8 @@ def genetic_algorithm_2(n_pop, n_iter, n_max_mut, r_cross, k):
         while len(pop)<n_pop:
             results = []
             for i in range(n_p):
-                ind = [random.choice(pop_spc), round(random.choice(cross_spc),2), random.choice(mut_spc)]
+                ind = [random.choice(pop_spc), round(random.choice(cross_spc),2), random.choice(mut_spc), random.choice(cross_type_spc)]
+                print(ind)
                 res = pool.apply_async(objective_calc, args=(ind, ))
                 results.append(res)
             res_arr = [res.get() for res in results if res.get()!=None]
@@ -572,8 +599,19 @@ def genetic_algorithm_2(n_pop, n_iter, n_max_mut, r_cross, k):
 
 """### Variables and Hyperparameters"""
 
-# set restrictions
+# map set-up
+map_num = 24
+map = select_map(map_num)
+flag_pos = flag(map_num)
+start_pos = start(map_num)
+total_step = steps_calc(map)
+n_columns = columns(map_num)
+map_best = best_score(map_num)
+gen_num = round(total_step*3/2)
+time_limit = 60
 
+# set restrictions
+"""Population size"""
 """100 --> 1000"""
 # pop_step = 100
 # pop_lower = 100
@@ -583,23 +621,28 @@ def genetic_algorithm_2(n_pop, n_iter, n_max_mut, r_cross, k):
 """10 --> 10000"""
 pop_spc = [10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000]
 
+"""Crossover rate"""
 cross_step = 0.1
 cross_lower = 0.1
 cross_upper = 1
 cross_spc = np.arange(cross_lower, cross_upper, 0.1)
 
+"""Mutation rate"""
 mut_step = 1
 mut_lower = 1
 mut_upper = int(gen_num/4)
 mut_spc = np.arange(mut_lower, mut_upper, 2)
+
+"""Crossover type"""
+cross_type_spc = ['one-point', 'two-point', 'uniform']
 
 # hyperparameters
 k2 = 3
 n_max_mut2 = 3
 n_pop2 = 5
 r_cross2 = 0.5
-n_iter2 = 5
-time_limit = 60
+n_iter2 = 10
+
 
 """### Run everything"""
 
